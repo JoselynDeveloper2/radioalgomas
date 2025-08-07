@@ -1,0 +1,257 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    /* TuCanalTV Brand Colors */
+    --color-tucanaltv-blue: #007bff;
+    --color-tucanaltv-blue-dark: #0056b3;
+    --color-tucanaltv-blue-light: #66b3ff;
+    --color-tucanaltv-hover: #9b3e37;
+
+    --color-accent: var(--color-tucanaltv-blue);
+    --color-accent-content: var(--color-tucanaltv-blue);
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-white);
+        --color-accent-content: var(--color-white);
+        --color-accent-foreground: var(--color-neutral-800);
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */
+
+/* TuCanalTV Custom Styles */
+@layer components {
+    .tucanaltv-header {
+        @apply bg-tucanaltv-blue text-white;
+    }
+    
+    .tucanaltv-btn-primary {
+        @apply bg-tucanaltv-blue hover:bg-tucanaltv-blue-dark text-white font-semibold py-2 px-4 rounded transition-colors;
+    }
+    
+    .tucanaltv-btn-secondary {
+        @apply bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded transition-colors;
+    }
+    
+    .tucanaltv-link-hover {
+        @apply hover:text-tucanaltv-hover transition-colors;
+    }
+    
+    .tucanaltv-category-badge {
+        @apply inline-block px-3 py-1 text-xs font-semibold rounded-full;
+    }
+    
+    .tucanaltv-news-card {
+        @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300;
+    }
+    
+    .tucanaltv-featured-title {
+        @apply text-xl font-bold text-white bg-tucanaltv-blue py-3 px-3 mb-2;
+    }
+}
+
+@layer utilities {
+    .bg-tucanaltv-blue {
+        background-color: var(--color-tucanaltv-blue);
+    }
+    
+    .bg-tucanaltv-blue-dark {
+        background-color: var(--color-tucanaltv-blue-dark);
+    }
+    
+    .bg-tucanaltv-blue-light {
+        background-color: var(--color-tucanaltv-blue-light);
+    }
+    
+    .text-tucanaltv-blue {
+        color: var(--color-tucanaltv-blue);
+    }
+    
+    .text-tucanaltv-hover {
+        color: var(--color-tucanaltv-hover);
+    }
+    
+    .border-tucanaltv-blue {
+        border-color: var(--color-tucanaltv-blue);
+    }
+    
+    .hover\:bg-tucanaltv-blue-dark:hover {
+        background-color: var(--color-tucanaltv-blue-dark);
+    }
+    
+    .hover\:text-tucanaltv-hover:hover {
+        color: var(--color-tucanaltv-hover);
+    }
+    
+    /* Line clamp utilities for text truncation */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* Modern backdrop blur effect */
+    .backdrop-blur-sm {
+        backdrop-filter: blur(4px);
+    }
+    
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Article prose improvements */
+    .prose img {
+        @apply rounded-lg shadow-md;
+    }
+    
+    .prose h2, .prose h3, .prose h4 {
+        @apply text-gray-900 dark:text-white;
+    }
+    
+    .prose a {
+        @apply text-tucanaltv-blue hover:text-tucanaltv-blue-dark no-underline;
+    }
+    
+    .prose a:hover {
+        @apply underline;
+    }
+    
+    /* Custom focus states */
+    .focus\:ring-tucanaltv:focus {
+        @apply ring-tucanaltv-blue;
+    }
+    
+    /* Responsive typography */
+    @screen sm {
+        .responsive-text-lg {
+            @apply text-lg;
+        }
+        
+        .responsive-text-xl {
+            @apply text-xl;
+        }
+        
+        .responsive-text-2xl {
+            @apply text-2xl;
+        }
+    }
+    
+    @screen md {
+        .responsive-text-lg {
+            @apply text-xl;
+        }
+        
+        .responsive-text-xl {
+            @apply text-2xl;
+        }
+        
+        .responsive-text-2xl {
+            @apply text-3xl;
+        }
+    }
+    
+    @screen lg {
+        .responsive-text-lg {
+            @apply text-xl;
+        }
+        
+        .responsive-text-xl {
+            @apply text-3xl;
+        }
+        
+        .responsive-text-2xl {
+            @apply text-4xl;
+        }
+    }
+    
+    /* Mobile optimizations */
+    @screen max-sm {
+        .mobile-padding {
+            @apply px-4;
+        }
+        
+        .mobile-text-sm {
+            @apply text-sm;
+        }
+        
+        .mobile-grid-cols-1 {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Print styles */
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        
+        .print-friendly {
+            @apply text-black bg-white;
+        }
+        
+        article {
+            break-inside: avoid;
+        }
+    }
+}

@@ -1,0 +1,281 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Observers;
+
+use App\Models\Article;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class ArticleObserver
+{
+    /**
+     * Handle the Article "creating" event.
+     */
+    public function creating(Article $article): void
+    {
+        $this->generateSlug($article);
+        $this->generateSeoFields($article);
+        $this->calculateReadingTime($article);
+    }
+
+    /**
+     * Handle the Article "updating" event.
+     */
+    public function updating(Article $article): void
+    {
+        // Solo actualizar slug si está vacío o si el título cambió
+        if ($article->isDirty('title') && (empty($article->slug) || $article->slug === Str::slug($article->getOriginal('title')))) {
+            $this->generateSlug($article);
+        }
+
+        // Actualizar campos SEO si el título o contenido cambió
+        if ($article->isDirty(['title', 'content', 'excerpt'])) {
+            $this->generateSeoFields($article);
+        }
+
+        // Recalcular tiempo de lectura si el contenido cambió
+        if ($article->isDirty('content')) {
+            $this->calculateReadingTime($article);
+        }
+    }
+
+    /**
+     * Handle the Article "saved" event.
+     */
+    public function saved(Article $article): void
+    {
+        // Generar schema markup después de guardar (para tener ID)
+        if (empty($article->schema_markup) || $article->wasRecentlyCreated) {
+            $article->updateQuietly([
+                'schema_markup' => $article->generateSchemaMarkup()
+            ]);
+        }
+
+        // Notificar a Google cuando el artículo se publica o actualiza
+        if ($article->isPublished()) {
+            $this->notifyGoogleIndexing($article);
+        }
+    }
+
+    /**
+     * Handle the Article "deleted" event.
+     */
+    public function deleted(Article $article): void
+    {
+        // Notificar a Google sobre la eliminación del artículo
+        if ($article->isPublished()) {
+            $this->notifyGoogleUrlDeleted($article);
+        }
+    }
+
+    /**
+     * Handle the Article "restored" event.
+     */
+    public function restored(Article $article): void
+    {
+        // Regenerar campos SEO al restaurar
+        $this->generateSeoFields($article);
+    }
+
+    /**
+     * Handle the Article "force deleted" event.
+     */
+    public function forceDeleted(Article $article): void
+    {
+        // Lógica adicional al eliminar permanentemente si es necesario
+    }
+
+    /**
+     * Generar slug único para el artículo
+     */
+    private function generateSlug(Article $article): void
+    {
+        if (empty($article->slug) && !empty($article->title)) {
+            $baseSlug = Str::slug($article->title);
+            $slug = $baseSlug;
+            $counter = 1;
+
+            // Verificar que el slug sea único
+            while (Article::where('slug', $slug)
+                         ->where('id', '!=', $article->id ?? 0)
+                         ->exists()) {
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+
+            $article->slug = $slug;
+        }
+    }
+
+    /**
+     * Generar campos SEO automáticamente
+     */
+    private function generateSeoFields(Article $article): void
+    {
+        // Meta title
+        if (empty($article->meta_title)) {
+            $article->meta_title = Str::limit($article->title, 60);
+        }
+
+        // Meta description
+        if (empty($article->meta_description)) {
+            if (!empty($article->excerpt)) {
+                $article->meta_description = Str::limit($article->excerpt, 160);
+            } else {
+                $article->meta_description = Str::limit(strip_tags($article->content), 160);
+            }
+        }
+
+        // Meta keywords (extraer palabras clave del título y contenido)
+        if (empty($article->meta_keywords)) {
+            $article->meta_keywords = $this->generateKeywords($article);
+        }
+
+        // Open Graph fields
+        if (empty($article->og_title)) {
+            $article->og_title = $article->meta_title;
+        }
+
+        if (empty($article->og_description)) {
+            $article->og_description = $article->meta_description;
+        }
+
+        // Canonical URL
+        if (empty($article->canonical_url)) {
+            $article->canonical_url = url('/articulos/' . ($article->slug ?: Str::slug($article->title)));
+        }
+    }
+
+    /**
+     * Calcular tiempo de lectura
+     */
+    private function calculateReadingTime(Article $article): void
+    {
+        if (!empty($article->content)) {
+            $wordCount = str_word_count(strip_tags($article->content));
+            $article->reading_time = max(1, ceil($wordCount / 200)); // 200 palabras por minuto
+        }
+    }
+
+    /**
+     * Generar palabras clave automáticamente
+     */
+    private function generateKeywords(Article $article): string
+    {
+        $text = $article->title . ' ' . strip_tags($article->content);
+        $text = strtolower($text);
+        
+        // Remover palabras comunes en español
+        $stopWords = [
+            'el', 'la', 'de', 'que', 'y', 'a', 'en', 'un', 'es', 'se', 'no', 'te', 'lo', 'le',
+            'da', 'su', 'por', 'son', 'con', 'para', 'al', 'del', 'los', 'las', 'una', 'como',
+            'pero', 'sus', 'le', 'ya', 'o', 'fue', 'este', 'ha', 'si', 'porque', 'esta', 'son',
+            'entre', 'cuando', 'muy', 'sin', 'sobre', 'ser', 'tiene', 'también', 'me', 'hasta',
+            'hay', 'donde', 'han', 'quien', 'están', 'estado', 'desde', 'todo', 'nos', 'durante',
+            'todos', 'uno', 'les', 'ni', 'contra', 'otros', 'fueron', 'ese', 'eso', 'había',
+            'ante', 'ellos', 'e', 'esto', 'mí', 'antes', 'algunos', 'qué', 'unos', 'yo', 'otro',
+            'otras', 'otra', 'él', 'tanto', 'esa', 'estos', 'mucho', 'quienes', 'nada', 'muchos',
+            'cual', 'poco', 'ella', 'estar', 'haber', 'estas', 'estaba', 'estamos', 'pueden',
+            'hacen', 'entonces', 'tiempo', 'cada', 'más', 'años', 'año', 'día', 'días'
+        ];
+        
+        // Extraer palabras
+        $words = str_word_count($text, 1, 'áéíóúñü');
+        $words = array_filter($words, function($word) use ($stopWords) {
+            return strlen($word) > 3 && !in_array($word, $stopWords);
+        });
+        
+        // Contar frecuencia
+        $wordCount = array_count_values($words);
+        arsort($wordCount);
+        
+        // Tomar las 10 palabras más frecuentes
+        $keywords = array_slice(array_keys($wordCount), 0, 10);
+        
+        return implode(', ', $keywords);
+    }
+
+    /**
+     * Notificar a Google sobre la indexación del artículo
+     */
+    private function notifyGoogleIndexing(Article $article): void
+    {
+        try {
+            // Verificar si las credenciales de Google están configuradas
+            if (!config('services.google.indexing_api_key')) {
+                Log::info('Google Indexing API key not configured, skipping notification for article: ' . $article->id);
+                return;
+            }
+
+            $url = $article->canonical_url;
+            $apiKey = config('services.google.indexing_api_key');
+
+            // Enviar solicitud a Google Indexing API
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post("https://indexing.googleapis.com/v3/urlNotifications:publish?key={$apiKey}", [
+                'url' => $url,
+                'type' => 'URL_UPDATED'
+            ]);
+
+            if ($response->successful()) {
+                Log::info("Google indexing notification sent successfully for article: {$article->id} - {$url}");
+            } else {
+                Log::warning("Failed to send Google indexing notification for article: {$article->id}", [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                    'url' => $url
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Error sending Google indexing notification for article: {$article->id}", [
+                'error' => $e->getMessage(),
+                'url' => $article->canonical_url ?? 'N/A'
+            ]);
+        }
+    }
+
+    /**
+     * Notificar a Google sobre la eliminación de un artículo
+     */
+    private function notifyGoogleUrlDeleted(Article $article): void
+    {
+        try {
+            // Verificar si las credenciales de Google están configuradas
+            if (!config('services.google.indexing_api_key')) {
+                return;
+            }
+
+            $url = $article->canonical_url;
+            $apiKey = config('services.google.indexing_api_key');
+
+            // Enviar solicitud a Google Indexing API para URL eliminada
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post("https://indexing.googleapis.com/v3/urlNotifications:publish?key={$apiKey}", [
+                'url' => $url,
+                'type' => 'URL_DELETED'
+            ]);
+
+            if ($response->successful()) {
+                Log::info("Google URL deletion notification sent successfully for article: {$article->id} - {$url}");
+            } else {
+                Log::warning("Failed to send Google URL deletion notification for article: {$article->id}", [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                    'url' => $url
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Error sending Google URL deletion notification for article: {$article->id}", [
+                'error' => $e->getMessage(),
+                'url' => $article->canonical_url ?? 'N/A'
+            ]);
+        }
+    }
+}
