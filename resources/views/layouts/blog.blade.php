@@ -219,12 +219,15 @@
         function toggleTheme() {
             const html = document.documentElement;
             html.classList.toggle('dark');
-            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+            localStorage.setItem('color-theme', html.classList.contains('dark') ? 'dark' : 'light');
         }
 
-        // Initialize theme
-        if (localStorage.getItem('theme') === 'light') {
+        // Initialize theme - default to light mode
+        if (localStorage.getItem('color-theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
             document.documentElement.classList.remove('dark');
+            localStorage.setItem('color-theme', 'light');
         }
     </script>
 
