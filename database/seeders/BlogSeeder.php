@@ -20,7 +20,7 @@ class BlogSeeder extends Seeder
     {
         // Crear usuarios
         $admin = User::firstOrCreate(
-            ['email' => 'admin@tucanaltv.com'],
+            ['email' => 'admin@tucanaltv.tv'],
             [
                 'name' => 'Administrador',
                 'password' => Hash::make('password'),
@@ -33,7 +33,7 @@ class BlogSeeder extends Seeder
         );
 
         $editor = User::firstOrCreate(
-            ['email' => 'editor@tucanaltv.com'],
+            ['email' => 'editor@tucanaltv.tv'],
             [
                 'name' => 'Editor Principal',
                 'password' => Hash::make('password'),
@@ -45,7 +45,7 @@ class BlogSeeder extends Seeder
         );
 
         $author = User::firstOrCreate(
-            ['email' => 'periodista@tucanaltv.com'],
+            ['email' => 'periodista@tucanaltv.tv'],
             [
                 'name' => 'Periodista TuCanalTV',
                 'password' => Hash::make('password'),
@@ -207,12 +207,12 @@ class BlogSeeder extends Seeder
                 ['slug' => Str::slug($articleData['title'])],
                 $articleData
             );
-            
+
             // Asignar etiquetas aleatoriamente solo si es un artículo nuevo
             if ($article->wasRecentlyCreated) {
                 $randomTags = collect([$urgentTag, $exclusiveTag, $interviewTag, $analysisTag])
                     ->random(rand(1, 2));
-                
+
                 $article->tags()->attach($randomTags->pluck('id'));
             }
         }
