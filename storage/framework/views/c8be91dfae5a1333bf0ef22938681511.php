@@ -871,3 +871,4 @@
     </script>
   </body>
 </html>
+<?php /**PATH C:\Users\ghati\Herd\tucanaltv\resources\views/errors/503.blade.php ENDPATH**/ ?>
