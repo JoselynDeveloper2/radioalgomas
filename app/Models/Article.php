@@ -258,10 +258,14 @@ class Article extends Model
     protected static function handleFeaturedArticle($newArticle): void
     {
         // Quitar destacado de todos los artículos actuales
-        static::where('is_featured', true)->update(['is_featured' => false]);
+        static::withoutEvents(function () {
+            static::where('is_featured', true)->update(['is_featured' => false]);
+        });
         
         // Marcar el nuevo artículo como destacado
-        $newArticle->update(['is_featured' => true]);
+        $newArticle->withoutEvents(function () use ($newArticle) {
+            $newArticle->update(['is_featured' => true]);
+        });
     }
 
     // Boot method para eventos del modelo
@@ -297,9 +301,11 @@ class Article extends Model
         static::saved(function ($article) {
             // Generar schema markup automáticamente
             if (empty($article->schema_markup)) {
-                $article->update([
-                    'schema_markup' => $article->generateSchemaMarkup()
-                ]);
+                $article->withoutEvents(function () use ($article) {
+                    $article->update([
+                        'schema_markup' => $article->generateSchemaMarkup()
+                    ]);
+                });
             }
             
             // Auto-destacar el último artículo publicado

@@ -19,35 +19,40 @@ class BlogSeeder extends Seeder
     public function run(): void
     {
         // Crear usuarios
-        $admin = User::create([
-            'name' => 'Administrador',
-            'email' => 'admin@tucanaltv.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-            'role' => User::ROLE_ADMIN,
-            'is_active' => true,
-            'bio' => 'Administrador principal del sitio web de TuCanalTV.',
-            'website' => 'https://tucanaltv.com',
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@tucanaltv.com'],
+            [
+                'name' => 'Administrador',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'role' => User::ROLE_ADMIN,
+                'is_active' => true,
+                'bio' => 'Administrador principal del sitio web de TuCanalTV.',
+                'website' => 'https://tucanaltv.com',
+            ]
+        );
 
-        $editor = User::create([
-            'name' => 'Editor Principal',
-            'email' => 'editor@tucanaltv.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-            'role' => User::ROLE_EDITOR,
-            'is_active' => true,
-            'bio' => 'Editor principal encargado de revisar y publicar contenido.',
-        ]);
+        $editor = User::firstOrCreate(
+            ['email' => 'editor@tucanaltv.com'],
+            [
+                'name' => 'Editor Principal',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'role' => User::ROLE_EDITOR,
+                'is_active' => true,
+                'bio' => 'Editor principal encargado de revisar y publicar contenido.',
+            ]
+        );
 
-        $author = User::create([
-            'name' => 'Periodista TuCanalTV',
-            'email' => 'periodista@tucanaltv.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-            'role' => User::ROLE_AUTHOR,
-            'is_active' => true,
-            'bio' => 'Periodista especializado en noticias locales y nacionales.',
+        $author = User::firstOrCreate(
+            ['email' => 'periodista@tucanaltv.com'],
+            [
+                'name' => 'Periodista TuCanalTV',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'role' => User::ROLE_AUTHOR,
+                'is_active' => true,
+                'bio' => 'Periodista especializado en noticias locales y nacionales.',
             'twitter' => '@periodista_tcv',
         ]);
 
@@ -101,7 +106,10 @@ class BlogSeeder extends Seeder
         ];
 
         foreach ($categories as $categoryData) {
-            Category::create($categoryData);
+            Category::firstOrCreate(
+                ['slug' => $categoryData['slug']],
+                $categoryData
+            );
         }
 
         // Crear etiquetas
@@ -117,7 +125,10 @@ class BlogSeeder extends Seeder
         ];
 
         foreach ($tags as $tagData) {
-            Tag::create($tagData);
+            Tag::firstOrCreate(
+                ['slug' => $tagData['slug']],
+                $tagData
+            );
         }
 
         // Obtener categorías y etiquetas creadas
@@ -192,13 +203,18 @@ class BlogSeeder extends Seeder
         ];
 
         foreach ($articles as $articleData) {
-            $article = Article::create($articleData);
+            $article = Article::firstOrCreate(
+                ['slug' => Str::slug($articleData['title'])],
+                $articleData
+            );
             
-            // Asignar etiquetas aleatoriamente
-            $randomTags = collect([$urgentTag, $exclusiveTag, $interviewTag, $analysisTag])
-                ->random(rand(1, 2));
-            
-            $article->tags()->attach($randomTags->pluck('id'));
+            // Asignar etiquetas aleatoriamente solo si es un artículo nuevo
+            if ($article->wasRecentlyCreated) {
+                $randomTags = collect([$urgentTag, $exclusiveTag, $interviewTag, $analysisTag])
+                    ->random(rand(1, 2));
+                
+                $article->tags()->attach($randomTags->pluck('id'));
+            }
         }
 
         $this->command->info('Blog seeder ejecutado exitosamente!');
