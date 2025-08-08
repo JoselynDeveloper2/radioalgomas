@@ -44,12 +44,12 @@ class BlogController extends Controller
             });
         }
 
-        // Obtener artículos destacados primero (solo 2)
+        // Obtener artículos destacados primero (solo 3)
         $featuredArticles = Article::with(['category', 'user'])
             ->published()
             ->featured()
             ->latest('published_at')
-            ->take(2)
+            ->take(3)
             ->get();
 
         // Excluir artículos destacados de la lista principal
@@ -58,7 +58,7 @@ class BlogController extends Controller
             $query->whereNotIn('id', $featuredIds);
         }
 
-        $articles = $query->paginate(12);
+        $articles = $query->paginate(9);
 
         $categories = Category::active()->ordered()->get();
         $popularTags = Tag::withCount('articles')
@@ -68,7 +68,7 @@ class BlogController extends Controller
 
         return view('blog.index', compact(
             'articles',
-            'featuredArticles', 
+            'featuredArticles',
             'categories',
             'popularTags'
         ));
@@ -106,7 +106,7 @@ class BlogController extends Controller
                 ->latest('published_at')
                 ->take(4 - $relatedArticles->count())
                 ->get();
-            
+
             $relatedArticles = $relatedArticles->merge($additionalArticles);
         }
 

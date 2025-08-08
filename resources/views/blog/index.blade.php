@@ -19,7 +19,7 @@
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     @foreach ($featuredArticles as $index => $article)
-                        <x-article-card :article="$article" :layout="$index === 0 ? 'featured' : 'default'" :show-author="true" :show-excerpt="true"
+                        <x-article-card :article="$article" :layout="'default'" :show-author="true" :show-excerpt="true"
                             :show-category="true" />
                     @endforeach
                 </div>

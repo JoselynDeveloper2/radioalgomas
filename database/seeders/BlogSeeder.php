@@ -28,7 +28,7 @@ class BlogSeeder extends Seeder
                 'role' => User::ROLE_ADMIN,
                 'is_active' => true,
                 'bio' => 'Administrador principal del sitio web de TuCanalTV.',
-                'website' => 'https://tucanaltv.com',
+                'website' => 'https://tucanaltv.tv',
             ]
         );
 

@@ -254,20 +254,6 @@ class Article extends Model
         ];
     }
 
-    // Método para manejar artículo destacado
-    protected static function handleFeaturedArticle($newArticle): void
-    {
-        // Quitar destacado de todos los artículos actuales
-        static::withoutEvents(function () {
-            static::where('is_featured', true)->update(['is_featured' => false]);
-        });
-        
-        // Marcar el nuevo artículo como destacado
-        $newArticle->withoutEvents(function () use ($newArticle) {
-            $newArticle->update(['is_featured' => true]);
-        });
-    }
-
     // Boot method para eventos del modelo
     protected static function boot()
     {
@@ -308,12 +294,30 @@ class Article extends Model
                 });
             }
             
-            // Auto-destacar el último artículo publicado
-            if ($article->status === self::STATUS_PUBLISHED && 
-                $article->published_at && 
-                $article->published_at <= now()) {
-                
-                static::handleFeaturedArticle($article);
+            // Lógica para auto-destacar los últimos 3 artículos
+            if (($article->wasRecentlyCreated || $article->isDirty('status')) && $article->status === self::STATUS_PUBLISHED) {
+                // Marcar el artículo actual como destacado si no lo está ya
+                if (!$article->is_featured) {
+                    $article->withoutEvents(function () use ($article) {
+                        $article->update(['is_featured' => true]);
+                    });
+                }
+
+                // Obtener los IDs de los 3 artículos destacados más recientes
+                $latestFeaturedIds = static::published()
+                    ->featured()
+                    ->latest('published_at')
+                    ->take(3)
+                    ->pluck('id');
+
+                // Quitar el estado de "destacado" de los artículos más antiguos
+                if ($latestFeaturedIds->count() > 0) {
+                    static::withoutEvents(function () use ($latestFeaturedIds) {
+                        static::where('is_featured', true)
+                            ->whereNotIn('id', $latestFeaturedIds)
+                            ->update(['is_featured' => false]);
+                    });
+                }
             }
         });
     }
