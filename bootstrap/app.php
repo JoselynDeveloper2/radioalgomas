@@ -13,6 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         //
     })
+    ->withSchedule(function ($schedule) {
+        // Importar noticias RSS cada 30 minutos
+        $schedule->command('rss:import')
+            ->everyThirtyMinutes()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/rss-import.log'));
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
