@@ -10,7 +10,7 @@
     <div class="text-center mb-12">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style="background-color: {{ $category->color }}20">
             @if($category->icon)
-                @svg('heroicon-o-' . $category->icon, 'w-6 h-6', ['style' => 'color: ' . $category->color])
+                @svg('heroicon-o-presentation-chart-line', 'w-6 h-6', ['style' => 'color: ' . $category->color])
             @else
             <div class="w-8 h-8 rounded-full" style="background-color: {{ $category->color }}"></div>
             @endif
