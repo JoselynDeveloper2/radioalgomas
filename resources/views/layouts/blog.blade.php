@@ -46,10 +46,25 @@
     <!-- Schema.org JSON-LD -->
     @stack('schema')
 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JRDQT4H1X1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        
+        gtag('config', 'G-JRDQT4H1X1');
+    </script>
+
     <!-- Additional Head Content -->
     @stack('head')
 </head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans antialiased">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQHH3HQ8"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div class="container mx-auto px-4">
