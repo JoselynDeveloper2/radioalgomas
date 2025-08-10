@@ -8,6 +8,9 @@ use App\Models\Article;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Google\Client as GoogleClient;
+use Google\Service\Indexing as GoogleIndexingService;
+use Google\Service\Indexing\UrlNotification;
 
 class ArticleObserver
 {
@@ -204,33 +207,32 @@ class ArticleObserver
     private function notifyGoogleIndexing(Article $article): void
     {
         try {
-            // Verificar si las credenciales de Google están configuradas
-            if (!config('services.google.indexing_api_key')) {
-                Log::info('Google Indexing API key not configured, skipping notification for article: ' . $article->id);
+            $client = $this->getGoogleClient();
+            if (!$client) {
+                Log::info('Google Indexing service account credentials not configured, skipping notification for article: ' . $article->id);
                 return;
             }
 
             $url = $article->canonical_url;
-            $apiKey = config('services.google.indexing_api_key');
+            $indexingService = new GoogleIndexingService($client);
+            
+            $urlNotification = new UrlNotification();
+            $urlNotification->setUrl($url);
+            $urlNotification->setType('URL_UPDATED');
 
-            // Enviar solicitud a Google Indexing API
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post("https://indexing.googleapis.com/v3/urlNotifications:publish?key={$apiKey}", [
-                'url' => $url,
-                'type' => 'URL_UPDATED'
+            $response = $indexingService->urlNotifications->publish($urlNotification);
+
+            Log::info("Google indexing notification sent successfully for article: {$article->id} - {$url}", [
+                'notification_time' => $response->getNotifyTime(),
+                'url' => $url
             ]);
 
-            if ($response->successful()) {
-                Log::info("Google indexing notification sent successfully for article: {$article->id} - {$url}");
-            } else {
-                Log::warning("Failed to send Google indexing notification for article: {$article->id}", [
-                    'status' => $response->status(),
-                    'response' => $response->body(),
-                    'url' => $url
-                ]);
-            }
-
+        } catch (\Google\Service\Exception $e) {
+            Log::warning("Google API error sending indexing notification for article: {$article->id}", [
+                'error' => $e->getMessage(),
+                'errors' => $e->getErrors(),
+                'url' => $article->canonical_url ?? 'N/A'
+            ]);
         } catch (\Exception $e) {
             Log::error("Error sending Google indexing notification for article: {$article->id}", [
                 'error' => $e->getMessage(),
@@ -245,37 +247,83 @@ class ArticleObserver
     private function notifyGoogleUrlDeleted(Article $article): void
     {
         try {
-            // Verificar si las credenciales de Google están configuradas
-            if (!config('services.google.indexing_api_key')) {
+            $client = $this->getGoogleClient();
+            if (!$client) {
+                Log::info('Google Indexing service account credentials not configured, skipping deletion notification for article: ' . $article->id);
                 return;
             }
 
             $url = $article->canonical_url;
-            $apiKey = config('services.google.indexing_api_key');
+            $indexingService = new GoogleIndexingService($client);
+            
+            $urlNotification = new UrlNotification();
+            $urlNotification->setUrl($url);
+            $urlNotification->setType('URL_DELETED');
 
-            // Enviar solicitud a Google Indexing API para URL eliminada
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post("https://indexing.googleapis.com/v3/urlNotifications:publish?key={$apiKey}", [
-                'url' => $url,
-                'type' => 'URL_DELETED'
+            $response = $indexingService->urlNotifications->publish($urlNotification);
+
+            Log::info("Google URL deletion notification sent successfully for article: {$article->id} - {$url}", [
+                'notification_time' => $response->getNotifyTime(),
+                'url' => $url
             ]);
 
-            if ($response->successful()) {
-                Log::info("Google URL deletion notification sent successfully for article: {$article->id} - {$url}");
-            } else {
-                Log::warning("Failed to send Google URL deletion notification for article: {$article->id}", [
-                    'status' => $response->status(),
-                    'response' => $response->body(),
-                    'url' => $url
-                ]);
-            }
-
+        } catch (\Google\Service\Exception $e) {
+            Log::warning("Google API error sending URL deletion notification for article: {$article->id}", [
+                'error' => $e->getMessage(),
+                'errors' => $e->getErrors(),
+                'url' => $article->canonical_url ?? 'N/A'
+            ]);
         } catch (\Exception $e) {
             Log::error("Error sending Google URL deletion notification for article: {$article->id}", [
                 'error' => $e->getMessage(),
                 'url' => $article->canonical_url ?? 'N/A'
             ]);
+        }
+    }
+
+    /**
+     * Obtener cliente de Google configurado para la API de indexing
+     */
+    private function getGoogleClient(): ?GoogleClient
+    {
+        try {
+            $serviceAccountJson = config('services.google.indexing.service_account_json');
+            $serviceAccountPath = config('services.google.indexing.service_account_path');
+            $scopes = config('services.google.indexing.scopes', ['https://www.googleapis.com/auth/indexing']);
+
+            if (!$serviceAccountJson && !$serviceAccountPath) {
+                Log::debug('Google Indexing service account credentials not configured');
+                return null;
+            }
+
+            $client = new GoogleClient();
+            $client->setScopes($scopes);
+
+            if ($serviceAccountJson) {
+                $credentials = json_decode($serviceAccountJson, true);
+                if (!$credentials) {
+                    Log::error('Invalid JSON format in GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON');
+                    return null;
+                }
+                $client->setAuthConfig($credentials);
+                Log::debug('Google Client configured with service account JSON string');
+            } elseif ($serviceAccountPath && file_exists($serviceAccountPath)) {
+                $client->setAuthConfig($serviceAccountPath);
+                Log::debug('Google Client configured with service account file path: ' . $serviceAccountPath);
+            } else {
+                Log::error('Google service account file not found at path: ' . ($serviceAccountPath ?? 'N/A'));
+                return null;
+            }
+
+            $client->useApplicationDefaultCredentials();
+            return $client;
+
+        } catch (\InvalidArgumentException $e) {
+            Log::error('Invalid Google service account configuration: ' . $e->getMessage());
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Error configuring Google client: ' . $e->getMessage());
+            return null;
         }
     }
 }

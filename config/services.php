@@ -36,7 +36,11 @@ return [
     ],
 
     'google' => [
-        'indexing_api_key' => env('GOOGLE_INDEXING_API_KEY'),
+        'indexing' => [
+            'service_account_json' => env('GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON'),
+            'service_account_path' => env('GOOGLE_INDEXING_SERVICE_ACCOUNT_PATH'),
+            'scopes' => ['https://www.googleapis.com/auth/indexing'],
+        ],
     ],
 
 ];
