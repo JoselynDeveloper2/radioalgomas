@@ -50,7 +50,7 @@
         <!-- Image Sitemap -->
         @if($article->featured_image)
         <image:image>
-            <image:loc>{{ $article->featured_image }}</image:loc>
+            <image:loc>{{ url($article->featured_image) }}</image:loc>
             <image:title><![CDATA[{{ $article->title }}]]></image:title>
             <image:caption><![CDATA[{{ $article->excerpt }}]]></image:caption>
         </image:image>
