@@ -54,6 +54,9 @@ class ImportRssNews extends Command
         } finally {
             $duration = now()->diffInSeconds($startTime);
             $this->info("⏱️  Tiempo total: {$duration} segundos");
+            
+            // Limpiar etiquetas huérfanas al final de cada importación
+            $this->cleanOrphanTags($importService);
         }
     }
 
@@ -209,6 +212,18 @@ class ImportRssNews extends Command
             foreach ($feedsWithErrors as $feed) {
                 $this->line("  • {$feed->name}: {$feed->last_error}");
             }
+        }
+    }
+
+    /**
+     * Limpiar etiquetas huérfanas
+     */
+    private function cleanOrphanTags(RssImportService $importService): void
+    {
+        $deletedCount = $importService->cleanOrphanTags();
+        
+        if ($deletedCount > 0) {
+            $this->info("🧹 Se limpiaron {$deletedCount} etiquetas huérfanas");
         }
     }
 }

@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Article;
 use App\Models\RssFeed;
+use App\Models\Tag;
 use Feeds;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -291,6 +292,9 @@ class RssImportService
                 ]
             ]);
 
+            // Generar y asignar etiquetas automáticamente
+            $this->assignAutoTags($article, $item);
+
             Log::info('Artículo RSS importado exitosamente', [
                 'article_id' => $article->id,
                 'title' => $article->title,
@@ -534,5 +538,182 @@ class RssImportService
         $sourceCredit .= '</div>';
         
         return $content . PHP_EOL . $sourceCredit;
+    }
+
+    /**
+     * Asignar etiquetas automáticamente basado en contenido
+     */
+    private function assignAutoTags(Article $article, array $item): void
+    {
+        $tags = $this->generateSmartTags($item, $article);
+        
+        if (!empty($tags)) {
+            $article->tags()->sync($tags);
+            
+            Log::info('Etiquetas asignadas automáticamente', [
+                'article_id' => $article->id,
+                'tags_count' => count($tags),
+                'tags' => Tag::whereIn('id', $tags)->pluck('name')->toArray()
+            ]);
+        }
+    }
+
+    /**
+     * Generar etiquetas inteligentes basadas en el contenido
+     */
+    private function generateSmartTags(array $item, Article $article): array
+    {
+        $maxTags = 8;
+        $assignedTags = [];
+        
+        // Combinar título y contenido para análisis
+        $fullContent = strtolower($item['title'] . ' ' . strip_tags($item['content'] ?? $item['description'] ?? ''));
+        
+        // Etiquetas basadas en palabras clave comunes
+        $keywordMap = [
+            // Urgencia y tiempo
+            'urgente' => ['urgente', 'última hora', 'breaking', 'ahora mismo', 'inmediatamente'],
+            'en-vivo' => ['en vivo', 'directo', 'live', 'transmisión', 'streaming'],
+            
+            // Tipo de contenido  
+            'exclusiva' => ['exclusiva', 'exclusivo', 'primicia', 'scoop'],
+            'entrevista' => ['entrevista', 'conversación', 'diálogo', 'charla'],
+            'analisis' => ['análisis', 'evaluación', 'estudio', 'investigación', 'informe'],
+            'opinion' => ['opinión', 'editorial', 'columna', 'punto de vista'],
+            'reportaje' => ['reportaje', 'crónica', 'documental', 'especial'],
+            
+            // Deportes específicos
+            'futbol' => ['fútbol', 'football', 'soccer', 'gol', 'partido'],
+            'beisbol' => ['béisbol', 'baseball', 'pelota', 'jonrón'],
+            'baloncesto' => ['baloncesto', 'basketball', 'basquet', 'canasta'],
+            
+            // Política específica
+            'gobierno' => ['gobierno', 'ministro', 'presidente', 'diputado', 'senador'],
+            'elecciones' => ['elección', 'voto', 'candidato', 'campaña', 'urnas'],
+            
+            // Economía específica
+            'finanzas' => ['banco', 'crédito', 'inversión', 'bolsa', 'mercado'],
+            'empleo' => ['trabajo', 'empleo', 'desempleo', 'salario', 'laboral'],
+            
+            // Entretenimiento específico
+            'celebridades' => ['actor', 'actriz', 'artista', 'famoso', 'celebridad'],
+            'musica' => ['música', 'canción', 'album', 'concierto', 'artista'],
+            'cine' => ['película', 'cine', 'filme', 'estreno', 'director'],
+            
+            // Emergencias y eventos
+            'emergencia' => ['emergencia', 'accidente', 'incidente', 'crisis', 'alerta'],
+            'salud' => ['salud', 'hospital', 'médico', 'enfermedad', 'vacuna'],
+            'educacion' => ['educación', 'escuela', 'universidad', 'estudiante', 'profesor'],
+            'tecnologia' => ['tecnología', 'internet', 'digital', 'app', 'software'],
+        ];
+        
+        // Buscar palabras clave en el contenido
+        foreach ($keywordMap as $tagSlug => $keywords) {
+            if (count($assignedTags) >= $maxTags) break;
+            
+            foreach ($keywords as $keyword) {
+                if (str_contains($fullContent, $keyword)) {
+                    $tag = $this->findOrCreateTag($tagSlug, ucfirst(str_replace('-', ' ', $tagSlug)));
+                    if ($tag && !in_array($tag->id, $assignedTags)) {
+                        $assignedTags[] = $tag->id;
+                        break; // Solo una vez por categoría
+                    }
+                }
+            }
+        }
+        
+        // Si no encontramos suficientes etiquetas, agregar basadas en la categoría
+        if (count($assignedTags) < 3) {
+            $categoryTag = $this->getCategoryTag($article->category_id);
+            if ($categoryTag && !in_array($categoryTag->id, $assignedTags)) {
+                $assignedTags[] = $categoryTag->id;
+            }
+        }
+        
+        // Agregar etiquetas genéricas si aún no tenemos suficientes
+        if (count($assignedTags) < 2) {
+            $genericTag = $this->findOrCreateTag('noticia', 'Noticia');
+            if ($genericTag && !in_array($genericTag->id, $assignedTags)) {
+                $assignedTags[] = $genericTag->id;
+            }
+        }
+        
+        return array_slice($assignedTags, 0, $maxTags);
+    }
+    
+    /**
+     * Encontrar o crear etiqueta
+     */
+    private function findOrCreateTag(string $slug, string $name): ?Tag
+    {
+        try {
+            return Tag::firstOrCreate(
+                ['slug' => $slug],
+                [
+                    'name' => $name,
+                    'is_active' => true,
+                    'color' => $this->getRandomTagColor()
+                ]
+            );
+        } catch (\Exception $e) {
+            Log::warning('Error creando etiqueta', [
+                'slug' => $slug,
+                'name' => $name,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+    
+    /**
+     * Obtener etiqueta basada en categoría
+     */
+    private function getCategoryTag(int $categoryId): ?Tag
+    {
+        $categoryTagMap = [
+            1 => 'local',      // Noticias Locales
+            2 => 'deportes',   // Deportes  
+            3 => 'entretenimiento', // Entretenimiento
+            4 => 'politica',   // Política
+            5 => 'economia',   // Economía
+        ];
+        
+        $tagSlug = $categoryTagMap[$categoryId] ?? null;
+        if (!$tagSlug) return null;
+        
+        return $this->findOrCreateTag($tagSlug, ucfirst($tagSlug));
+    }
+    
+    /**
+     * Obtener color aleatorio para etiquetas
+     */
+    private function getRandomTagColor(): string
+    {
+        $colors = [
+            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+            '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
+        ];
+        
+        return $colors[array_rand($colors)];
+    }
+    
+    /**
+     * Limpiar etiquetas huérfanas (sin artículos)
+     */
+    public function cleanOrphanTags(): int
+    {
+        $orphanTags = Tag::whereDoesntHave('articles')->get();
+        $count = $orphanTags->count();
+        
+        if ($count > 0) {
+            Tag::whereDoesntHave('articles')->delete();
+            
+            Log::info('Etiquetas huérfanas limpiadas', [
+                'deleted_count' => $count,
+                'deleted_tags' => $orphanTags->pluck('name')->toArray()
+            ]);
+        }
+        
+        return $count;
     }
 }

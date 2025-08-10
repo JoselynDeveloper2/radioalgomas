@@ -61,8 +61,9 @@ class BlogController extends Controller
         $articles = $query->paginate(9);
 
         $categories = Category::active()->ordered()->get();
-        $popularTags = Tag::withCount('articles')
-            ->orderBy('articles_count', 'desc')
+        $popularTags = Tag::withCount(['publishedArticles'])
+            ->having('published_articles_count', '>', 0)
+            ->orderBy('published_articles_count', 'desc')
             ->take(10)
             ->get();
 
@@ -149,8 +150,9 @@ class BlogController extends Controller
             ->paginate(12);
 
         $categories = Category::active()->ordered()->get();
-        $popularTags = Tag::withCount('articles')
-            ->orderBy('articles_count', 'desc')
+        $popularTags = Tag::withCount(['publishedArticles'])
+            ->having('published_articles_count', '>', 0)
+            ->orderBy('published_articles_count', 'desc')
             ->take(10)
             ->get();
 

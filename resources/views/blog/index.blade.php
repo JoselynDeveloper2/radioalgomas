@@ -126,7 +126,7 @@
                                     class="inline-block px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
                                     {{ $tag->name }}
                                     <span
-                                        class="text-xs text-gray-500 dark:text-gray-400 ml-1">({{ $tag->articles_count }})</span>
+                                        class="text-xs text-gray-500 dark:text-gray-400 ml-1">({{ $tag->published_articles_count }})</span>
                                 </a>
                             @endforeach
                         </div>
