@@ -307,11 +307,21 @@ class ArticleObserver
                 }
                 $client->setAuthConfig($credentials);
                 Log::debug('Google Client configured with service account JSON string');
-            } elseif ($serviceAccountPath && file_exists($serviceAccountPath)) {
-                $client->setAuthConfig($serviceAccountPath);
-                Log::debug('Google Client configured with service account file path: ' . $serviceAccountPath);
+            } elseif ($serviceAccountPath) {
+                // Convertir ruta relativa a ruta absoluta usando storage_path()
+                $fullPath = str_starts_with($serviceAccountPath, '/') 
+                    ? $serviceAccountPath 
+                    : storage_path('app/' . ltrim(str_replace('storage/app/', '', $serviceAccountPath), '/'));
+                
+                if (file_exists($fullPath)) {
+                    $client->setAuthConfig($fullPath);
+                    Log::debug('Google Client configured with service account file path: ' . $fullPath);
+                } else {
+                    Log::error('Google service account file not found at path: ' . $fullPath);
+                    return null;
+                }
             } else {
-                Log::error('Google service account file not found at path: ' . ($serviceAccountPath ?? 'N/A'));
+                Log::error('Google service account path not configured');
                 return null;
             }
 
