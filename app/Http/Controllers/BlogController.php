@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Illuminate\Http\Response;
 
@@ -44,13 +45,8 @@ class BlogController extends Controller
             });
         }
 
-        // Obtener artículos destacados primero (solo 3)
-        $featuredArticles = Article::with(['category', 'user'])
-            ->published()
-            ->featured()
-            ->latest('published_at')
-            ->take(3)
-            ->get();
+        // Obtener artículos destacados con prioridad para categoría reciente
+        $featuredArticles = $this->getFeaturedArticlesWithRotation();
 
         // Excluir artículos destacados de la lista principal
         if ($featuredArticles->isNotEmpty()) {
@@ -197,5 +193,78 @@ class BlogController extends Controller
 
         return response($content, 200)
             ->header('Content-Type', 'application/xml; charset=UTF-8');
+    }
+
+    /**
+     * Obtener artículos destacados con prioridad para la categoría recién importada
+     */
+    private function getFeaturedArticlesWithRotation()
+    {
+        // Buscar la categoría más recientemente importada (en los últimos 15 minutos)
+        $recentCategory = $this->getRecentlyImportedCategory();
+        
+        $featuredArticles = collect();
+        
+        if ($recentCategory) {
+            // Priorizar artículos de la categoría recién importada (máximo 2)
+            $categoryArticles = Article::with(['category', 'user'])
+                ->published()
+                ->where('category_id', $recentCategory->id)
+                ->latest('published_at')
+                ->take(2)
+                ->get();
+            
+            $featuredArticles = $featuredArticles->concat($categoryArticles);
+        }
+        
+        // Completar con otros artículos destacados si no tenemos 3
+        if ($featuredArticles->count() < 3) {
+            $excludeIds = $featuredArticles->pluck('id')->toArray();
+            $remainingSlots = 3 - $featuredArticles->count();
+            
+            $otherArticles = Article::with(['category', 'user'])
+                ->published()
+                ->when(!empty($excludeIds), function($q) use ($excludeIds) {
+                    return $q->whereNotIn('id', $excludeIds);
+                })
+                ->latest('published_at')
+                ->take($remainingSlots)
+                ->get();
+            
+            $featuredArticles = $featuredArticles->concat($otherArticles);
+        }
+        
+        return $featuredArticles->take(3);
+    }
+
+    /**
+     * Obtener la categoría importada más recientemente
+     */
+    private function getRecentlyImportedCategory(): ?Category
+    {
+        $categories = Category::active()
+            ->whereHas('rssFeeds', function($q) {
+                $q->active();
+            })
+            ->get();
+        
+        $recentCategory = null;
+        $mostRecentTime = null;
+        
+        foreach ($categories as $category) {
+            $lastImport = Cache::get("category_rotation_{$category->id}");
+            
+            if ($lastImport && (!$mostRecentTime || $lastImport > $mostRecentTime)) {
+                $mostRecentTime = $lastImport;
+                $recentCategory = $category;
+            }
+        }
+        
+        // Solo considerar si fue importada en los últimos 15 minutos
+        if ($recentCategory && $mostRecentTime && now()->diffInMinutes($mostRecentTime) <= 15) {
+            return $recentCategory;
+        }
+        
+        return null;
     }
 }

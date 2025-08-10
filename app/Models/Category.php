@@ -54,6 +54,11 @@ class Category extends Model
                     ->orderBy('published_at', 'desc');
     }
 
+    public function rssFeeds(): HasMany
+    {
+        return $this->hasMany(RssFeed::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

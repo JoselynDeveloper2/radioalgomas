@@ -14,12 +14,19 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function ($schedule) {
-        // Importar noticias RSS cada 30 minutos
-        $schedule->command('rss:import')
-            ->everyThirtyMinutes()
+        // Sistema de rotación: importar una categoría cada minuto (rotando cada 15 min)
+        $schedule->command('rss:import --rotate')
+            ->everyMinute()
             ->withoutOverlapping()
             ->runInBackground()
             ->appendOutputTo(storage_path('logs/rss-import.log'));
+        
+        // Comando de respaldo: importar todas las categorías cada 2 horas (por seguridad)
+        $schedule->command('rss:import --force')
+            ->everyTwoHours()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/rss-import-full.log'));
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
