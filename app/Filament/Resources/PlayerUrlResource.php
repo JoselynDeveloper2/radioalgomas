@@ -20,16 +20,11 @@ class PlayerUrlResource extends Resource
     protected static ?string $model = PlayerUrl::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-play';
-
     protected static ?string $navigationLabel = 'URLs del Player';
-
-    protected static ?string $modelLabel = 'URL del Player';
-
-    protected static ?string $pluralModelLabel = 'URLs del Player';
-
     protected static ?string $navigationGroup = 'Streaming';
-
     protected static ?int $navigationSort = 1;
+    protected static ?string $modelLabel = 'URL del Player';
+    protected static ?string $pluralModelLabel = 'URLs del Player';
 
     public static function form(Form $form): Form
     {

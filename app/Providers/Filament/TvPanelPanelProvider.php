@@ -57,6 +57,12 @@ class TvPanelPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make()
+            ])
+            ->navigationGroups([
+                'Contenido',
+                'RSS/Importación', 
+                'Streaming',
+                'Administración'
             ]);
     }
 }

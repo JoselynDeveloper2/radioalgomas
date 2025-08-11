@@ -29,16 +29,11 @@ class ArticleResource extends Resource
     protected static ?string $model = Article::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    
-    protected static ?string $navigationLabel = 'Artículos';
-    
-    protected static ?string $modelLabel = 'artículo';
-    
-    protected static ?string $pluralModelLabel = 'artículos';
-    
-    protected static ?string $navigationGroup = 'Gestión de Contenido';
-    
+    protected static ?string $navigationGroup = 'Contenido';
     protected static ?int $navigationSort = 1;
+    protected static ?string $navigationLabel = 'Artículos';
+    protected static ?string $modelLabel = 'artículo';
+    protected static ?string $pluralModelLabel = 'artículos';
 
     public static function form(Form $form): Form
     {

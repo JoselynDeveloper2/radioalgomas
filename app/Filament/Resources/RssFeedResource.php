@@ -20,16 +20,11 @@ class RssFeedResource extends Resource
     protected static ?string $model = RssFeed::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rss';
-
     protected static ?string $navigationLabel = 'Fuentes RSS';
-
+    protected static ?string $navigationGroup = 'RSS/Importación';
+    protected static ?int $navigationSort = 1;
     protected static ?string $modelLabel = 'Fuente RSS';
-
     protected static ?string $pluralModelLabel = 'Fuentes RSS';
-
-    protected static ?string $navigationGroup = 'Contenido';
-
-    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
