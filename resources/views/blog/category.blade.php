@@ -5,7 +5,7 @@
 @section('meta_keywords', $category->meta_keywords ?: $category->name . ', noticias, actualidad')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 pt-8 pb-28">
     <!-- Category Header -->
     <div class="text-center mb-12">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style="background-color: {{ $category->color }}20">

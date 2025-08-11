@@ -5,7 +5,7 @@
 @section('meta_keywords', $tag->name . ', noticias, actualidad')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 pt-8 pb-28">
     <!-- Tag Header -->
     <div class="text-center mb-12">
         <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
@@ -98,7 +98,7 @@
                                 {{ $article->views_count }}
                             </div>
                         </div>
-                        
+
                         <!-- Tags -->
                         @if($article->tags->count() > 0)
                         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">

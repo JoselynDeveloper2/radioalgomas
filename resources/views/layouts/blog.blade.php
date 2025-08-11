@@ -52,7 +52,7 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        
+
         gtag('config', 'G-JRDQT4H1X1');
     </script>
 
@@ -64,7 +64,7 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQHH3HQ8"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    
+
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div class="container mx-auto px-4">
@@ -152,7 +152,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 dark:bg-gray-900 text-white mt-16">
+    <footer class="bg-gray-800 dark:bg-gray-900 text-white">
         <div class="container mx-auto px-4 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Logo y Descripción -->

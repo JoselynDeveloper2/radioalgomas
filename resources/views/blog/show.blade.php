@@ -19,7 +19,7 @@
 @endpush
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 pt-8 pb-28">
     <div class="max-w-4xl mx-auto">
         <!-- Breadcrumb -->
         <nav class="flex mb-8" aria-label="Breadcrumb">

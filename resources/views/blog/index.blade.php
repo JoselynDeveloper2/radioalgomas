@@ -5,7 +5,7 @@
     TuCanalTV.')
 
 @section('content')
-    <div class="container mx-auto px-4 pb-8">
+    <div class="container mx-auto px-4 pb-28">
         <!-- Reproductor de Video en Vivo -->
         <section class="mb-8 mt-2">
             <x-video-player />
