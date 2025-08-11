@@ -168,37 +168,73 @@ class ArticleObserver
      */
     private function generateKeywords(Article $article): string
     {
-        $text = $article->title . ' ' . strip_tags($article->content);
-        $text = strtolower($text);
+        try {
+            $text = $article->title . ' ' . strip_tags($article->content);
+            
+            // Limpiar y normalizar texto para UTF-8
+            $text = mb_strtolower($text, 'UTF-8');
+            $text = $this->cleanUtf8Text($text);
+            
+            // Remover palabras comunes en español
+            $stopWords = [
+                'el', 'la', 'de', 'que', 'y', 'a', 'en', 'un', 'es', 'se', 'no', 'te', 'lo', 'le',
+                'da', 'su', 'por', 'son', 'con', 'para', 'al', 'del', 'los', 'las', 'una', 'como',
+                'pero', 'sus', 'le', 'ya', 'o', 'fue', 'este', 'ha', 'si', 'porque', 'esta', 'son',
+                'entre', 'cuando', 'muy', 'sin', 'sobre', 'ser', 'tiene', 'también', 'me', 'hasta',
+                'hay', 'donde', 'han', 'quien', 'están', 'estado', 'desde', 'todo', 'nos', 'durante',
+                'todos', 'uno', 'les', 'ni', 'contra', 'otros', 'fueron', 'ese', 'eso', 'había',
+                'ante', 'ellos', 'e', 'esto', 'mí', 'antes', 'algunos', 'qué', 'unos', 'yo', 'otro',
+                'otras', 'otra', 'él', 'tanto', 'esa', 'estos', 'mucho', 'quienes', 'nada', 'muchos',
+                'cual', 'poco', 'ella', 'estar', 'haber', 'estas', 'estaba', 'estamos', 'pueden',
+                'hacen', 'entonces', 'tiempo', 'cada', 'más', 'años', 'año', 'día', 'días'
+            ];
+            
+            // Extraer palabras usando expresión regular para UTF-8
+            preg_match_all('/\b\p{L}+\b/u', $text, $matches);
+            $words = $matches[0];
+            
+            $words = array_filter($words, function($word) use ($stopWords) {
+                return mb_strlen($word, 'UTF-8') > 3 && !in_array($word, $stopWords);
+            });
+            
+            // Contar frecuencia
+            $wordCount = array_count_values($words);
+            arsort($wordCount);
+            
+            // Tomar las 10 palabras más frecuentes y limpiarlas
+            $keywords = array_slice(array_keys($wordCount), 0, 10);
+            $keywords = array_map([$this, 'cleanUtf8Text'], $keywords);
+            
+            return implode(', ', $keywords);
+            
+        } catch (\Exception $e) {
+            Log::warning('Error generando keywords para artículo', [
+                'article_id' => $article->id ?? 'nuevo',
+                'error' => $e->getMessage()
+            ]);
+            return '';
+        }
+    }
+
+    /**
+     * Limpiar texto UTF-8 problemático
+     */
+    private function cleanUtf8Text(string $text): string
+    {
+        // Convertir a UTF-8 válido
+        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
         
-        // Remover palabras comunes en español
-        $stopWords = [
-            'el', 'la', 'de', 'que', 'y', 'a', 'en', 'un', 'es', 'se', 'no', 'te', 'lo', 'le',
-            'da', 'su', 'por', 'son', 'con', 'para', 'al', 'del', 'los', 'las', 'una', 'como',
-            'pero', 'sus', 'le', 'ya', 'o', 'fue', 'este', 'ha', 'si', 'porque', 'esta', 'son',
-            'entre', 'cuando', 'muy', 'sin', 'sobre', 'ser', 'tiene', 'también', 'me', 'hasta',
-            'hay', 'donde', 'han', 'quien', 'están', 'estado', 'desde', 'todo', 'nos', 'durante',
-            'todos', 'uno', 'les', 'ni', 'contra', 'otros', 'fueron', 'ese', 'eso', 'había',
-            'ante', 'ellos', 'e', 'esto', 'mí', 'antes', 'algunos', 'qué', 'unos', 'yo', 'otro',
-            'otras', 'otra', 'él', 'tanto', 'esa', 'estos', 'mucho', 'quienes', 'nada', 'muchos',
-            'cual', 'poco', 'ella', 'estar', 'haber', 'estas', 'estaba', 'estamos', 'pueden',
-            'hacen', 'entonces', 'tiempo', 'cada', 'más', 'años', 'año', 'día', 'días'
-        ];
+        // Remover caracteres de control y no válidos
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text);
         
-        // Extraer palabras
-        $words = str_word_count($text, 1, 'áéíóúñü');
-        $words = array_filter($words, function($word) use ($stopWords) {
-            return strlen($word) > 3 && !in_array($word, $stopWords);
-        });
+        // Remover emojis y caracteres especiales problemáticos
+        $text = preg_replace('/[\x{1F600}-\x{1F64F}]/u', '', $text); // emoticons
+        $text = preg_replace('/[\x{1F300}-\x{1F5FF}]/u', '', $text); // misc symbols
+        $text = preg_replace('/[\x{1F680}-\x{1F6FF}]/u', '', $text); // transport
+        $text = preg_replace('/[\x{2600}-\x{26FF}]/u', '', $text); // misc symbols
+        $text = preg_replace('/[\x{2700}-\x{27BF}]/u', '', $text); // dingbats
         
-        // Contar frecuencia
-        $wordCount = array_count_values($words);
-        arsort($wordCount);
-        
-        // Tomar las 10 palabras más frecuentes
-        $keywords = array_slice(array_keys($wordCount), 0, 10);
-        
-        return implode(', ', $keywords);
+        return trim($text);
     }
 
     /**

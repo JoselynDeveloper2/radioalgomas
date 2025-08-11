@@ -10,11 +10,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -182,6 +183,14 @@ class User extends Authenticatable
     public function canPublishArticles(): bool
     {
         return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_EDITOR]);
+    }
+
+    /**
+     * Verificar si el usuario es super admin (bypass de permisos)
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super_admin');
     }
 
     public function isActive(): bool
