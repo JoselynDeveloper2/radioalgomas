@@ -348,9 +348,13 @@ class ArticleObserver
                 if (str_starts_with($serviceAccountPath, '/') || str_contains($serviceAccountPath, ':\\')) {
                     $fullPath = $serviceAccountPath;
                 } else {
-                    // Si es relativa, construir usando storage_path()
-                    $relativePath = str_replace('storage/app/', '', $serviceAccountPath);
-                    $fullPath = storage_path('app/' . ltrim($relativePath, '/'));
+                    // Si es relativa y empieza con 'storage/', usar base_path()
+                    if (str_starts_with($serviceAccountPath, 'storage/')) {
+                        $fullPath = base_path($serviceAccountPath);
+                    } else {
+                        // Si es solo el archivo, asumir que está en storage/app/
+                        $fullPath = storage_path('app/' . ltrim($serviceAccountPath, '/'));
+                    }
                 }
                 
                 if (file_exists($fullPath)) {
