@@ -308,10 +308,14 @@ class ArticleObserver
                 $client->setAuthConfig($credentials);
                 Log::debug('Google Client configured with service account JSON string');
             } elseif ($serviceAccountPath) {
-                // Convertir ruta relativa a ruta absoluta usando storage_path()
-                $fullPath = str_starts_with($serviceAccountPath, '/') 
-                    ? $serviceAccountPath 
-                    : storage_path('app/' . ltrim(str_replace('storage/app/', '', $serviceAccountPath), '/'));
+                // Si la ruta es absoluta, usarla tal como está
+                if (str_starts_with($serviceAccountPath, '/') || str_contains($serviceAccountPath, ':\\')) {
+                    $fullPath = $serviceAccountPath;
+                } else {
+                    // Si es relativa, construir usando storage_path()
+                    $relativePath = str_replace('storage/app/', '', $serviceAccountPath);
+                    $fullPath = storage_path('app/' . ltrim($relativePath, '/'));
+                }
                 
                 if (file_exists($fullPath)) {
                     $client->setAuthConfig($fullPath);

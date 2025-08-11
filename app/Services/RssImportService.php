@@ -655,8 +655,27 @@ class RssImportService
                     'color' => $this->getRandomTagColor()
                 ]
             );
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Si es un error de duplicado, intentar encontrar la etiqueta existente
+            if (str_contains($e->getMessage(), 'Duplicate entry') || $e->getCode() === '23000') {
+                $existingTag = Tag::where('slug', $slug)->first();
+                if ($existingTag) {
+                    Log::debug('Etiqueta duplicada encontrada, usando existente', [
+                        'slug' => $slug,
+                        'existing_tag_id' => $existingTag->id
+                    ]);
+                    return $existingTag;
+                }
+            }
+            
             Log::warning('Error creando etiqueta', [
+                'slug' => $slug,
+                'name' => $name,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Error inesperado creando etiqueta', [
                 'slug' => $slug,
                 'name' => $name,
                 'error' => $e->getMessage()
@@ -668,8 +687,14 @@ class RssImportService
     /**
      * Obtener etiqueta basada en categoría
      */
-    private function getCategoryTag(int $categoryId): ?Tag
+    private function getCategoryTag($categoryId): ?Tag
     {
+        // Convertir a entero de forma segura
+        $categoryId = is_numeric($categoryId) ? (int) $categoryId : null;
+        
+        if (!$categoryId) {
+            return null;
+        }
         $categoryTagMap = [
             1 => 'local',      // Noticias Locales
             2 => 'deportes',   // Deportes  

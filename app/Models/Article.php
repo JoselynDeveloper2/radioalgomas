@@ -48,6 +48,9 @@ class Article extends Model
     protected $casts = [
         'published_at' => 'datetime',
         'reading_time' => 'integer',
+        'category_id' => 'integer',
+        'user_id' => 'integer',
+        'rss_feed_id' => 'integer',
         'schema_markup' => 'array',
         'is_imported' => 'boolean',
         'is_featured' => 'boolean',
