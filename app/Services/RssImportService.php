@@ -646,21 +646,25 @@ class RssImportService
      */
     private function findOrCreateTag(string $slug, string $name): ?Tag
     {
+        // Primero verificar si la etiqueta ya existe
+        $existingTag = Tag::where('slug', $slug)->first();
+        if ($existingTag) {
+            return $existingTag;
+        }
+
         try {
-            return Tag::firstOrCreate(
-                ['slug' => $slug],
-                [
-                    'name' => $name,
-                    'is_active' => true,
-                    'color' => $this->getRandomTagColor()
-                ]
-            );
+            return Tag::create([
+                'slug' => $slug,
+                'name' => $name,
+                'is_active' => true,
+                'color' => $this->getRandomTagColor()
+            ]);
         } catch (\Illuminate\Database\QueryException $e) {
             // Si es un error de duplicado, intentar encontrar la etiqueta existente
             if (str_contains($e->getMessage(), 'Duplicate entry') || $e->getCode() === '23000') {
                 $existingTag = Tag::where('slug', $slug)->first();
                 if ($existingTag) {
-                    Log::debug('Etiqueta duplicada encontrada, usando existente', [
+                    Log::debug('Etiqueta duplicada encontrada después de error, usando existente', [
                         'slug' => $slug,
                         'existing_tag_id' => $existingTag->id
                     ]);
