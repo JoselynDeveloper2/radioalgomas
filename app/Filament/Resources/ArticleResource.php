@@ -284,8 +284,7 @@ class ArticleResource extends Resource
                                                 'completed' => 'Completado',
                                                 'failed' => 'Falló',
                                             ])
-                                            ->disabled()
-                                            ->badge(),
+                                            ->disabled(),
                                         
                                         Forms\Components\DateTimePicker::make('content_rewritten_at')
                                             ->label('Reescrito en')
