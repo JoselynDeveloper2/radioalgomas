@@ -40,7 +40,7 @@ class TestGoogleIndexing extends Command
             $response = $indexingService->urlNotifications->publish($urlNotification);
 
             $this->info('✓ Indexing notification sent successfully!');
-            $this->line("Notification time: " . $response->getNotifyTime());
+            $this->line("Response: " . json_encode($response));
             $this->line("URL: {$url}");
 
             return 0;
