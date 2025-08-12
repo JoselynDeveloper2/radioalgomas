@@ -259,7 +259,7 @@ class ArticleObserver
             $response = $indexingService->urlNotifications->publish($urlNotification);
 
             Log::info("Google indexing notification sent successfully for article: {$article->id} - {$url}", [
-                'notification_time' => $response->getNotifyTime(),
+                'response' => json_encode($response),
                 'url' => $url
             ]);
 
@@ -299,7 +299,7 @@ class ArticleObserver
             $response = $indexingService->urlNotifications->publish($urlNotification);
 
             Log::info("Google URL deletion notification sent successfully for article: {$article->id} - {$url}", [
-                'notification_time' => $response->getNotifyTime(),
+                'response' => json_encode($response),
                 'url' => $url
             ]);
 
