@@ -144,6 +144,7 @@ class ArticleResource extends Resource
                                         Forms\Components\FileUpload::make('featured_image')
                                             ->label('Imagen Destacada')
                                             ->image()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
                                             ->directory('articles/featured')
                                             ->disk('public')
                                             ->imageEditor()
@@ -153,7 +154,7 @@ class ArticleResource extends Resource
                                                 '1:1',
                                             ])
                                             ->maxSize(5120)
-                                            ->helperText('Imagen principal del artículo (máximo 5MB)'),
+                                            ->helperText('Imagen principal del artículo (máximo 5MB, formatos: JPG, PNG, GIF, WebP)'),
                                     ]),
                                 
                                 Section::make('Imagen para Redes Sociales')
@@ -161,6 +162,7 @@ class ArticleResource extends Resource
                                         Forms\Components\FileUpload::make('og_image')
                                             ->label('Imagen Open Graph')
                                             ->image()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
                                             ->directory('articles/og')
                                             ->disk('public')
                                             ->imageEditor()
@@ -168,7 +170,7 @@ class ArticleResource extends Resource
                                                 '1.91:1',
                                             ])
                                             ->maxSize(5120)
-                                            ->helperText('Imagen para compartir en redes sociales (1200x630px recomendado)'),
+                                            ->helperText('Imagen para compartir en redes sociales (1200x630px recomendado, formatos: JPG, PNG, GIF, WebP)'),
                                     ]),
                             ]),
                         
