@@ -27,6 +27,20 @@ return Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->runInBackground()
             ->appendOutputTo(storage_path('logs/rss-import-full.log'));
+        
+        // Procesar contenido RSS para evitar duplicados (cada 30 minutos)
+        $schedule->command('rss:process-with-delay --delay=15 --imported-only --batch=5')
+            ->everyThirtyMinutes()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/rss-process.log'));
+            
+        // Limpiar contenido duplicado cada 4 horas
+        $schedule->command('news:rewrite-content --batch=10 --status=pending')
+            ->everyFourHours()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/content-rewrite.log'));
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

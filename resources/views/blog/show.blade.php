@@ -1,17 +1,17 @@
 @extends('layouts.blog')
 
-@section('title', $article->meta_title ?: $article->title)
-@section('meta_description', $article->meta_description ?: $article->excerpt)
+@section('title', $article->seo_title ?: $article->meta_title ?: $article->title)
+@section('meta_description', $article->seo_meta_description ?: $article->meta_description ?: $article->excerpt)
 @section('meta_keywords', $article->meta_keywords)
-@section('canonical_url', $article->canonical_url ?: route('blog.show', $article->slug))
+@section('canonical_url', $article->seo_canonical_url ?: $article->canonical_url ?: route('blog.show', $article->slug))
 
 @section('og_type', 'article')
-@section('og_title', $article->og_title ?: $article->title)
-@section('og_description', $article->og_description ?: $article->excerpt)
+@section('og_title', $article->og_title ?: $article->seo_title ?: $article->title)
+@section('og_description', $article->og_description ?: $article->seo_meta_description ?: $article->excerpt)
 @section('og_image', $article->og_image ? Storage::url($article->og_image) : ($article->featured_image ? Storage::url($article->featured_image) : ''))
 
-@section('twitter_title', $article->og_title ?: $article->title)
-@section('twitter_description', $article->og_description ?: $article->excerpt)
+@section('twitter_title', $article->og_title ?: $article->seo_title ?: $article->title)
+@section('twitter_description', $article->og_description ?: $article->seo_meta_description ?: $article->excerpt)
 @section('twitter_image', $article->og_image ? Storage::url($article->og_image) : ($article->featured_image ? Storage::url($article->featured_image) : ''))
 
 @push('schema')
