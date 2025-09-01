@@ -162,7 +162,7 @@ select:focus[data-flux-control] {
     
     /* Article prose improvements */
     .prose img {
-        @apply rounded-lg shadow-md;
+        @apply rounded-lg shadow-md max-w-full h-auto;
     }
     
     .prose h2, .prose h3, .prose h4 {
@@ -175,6 +175,21 @@ select:focus[data-flux-control] {
     
     .prose a:hover {
         @apply underline;
+    }
+    
+    /* Prevent horizontal scroll in article content */
+    .prose {
+        @apply overflow-x-hidden;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .prose pre {
+        @apply max-w-full overflow-x-auto;
+    }
+    
+    .prose table {
+        @apply max-w-full overflow-x-auto block;
     }
     
     /* Custom focus states */

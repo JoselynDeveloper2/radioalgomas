@@ -4,20 +4,20 @@
 ])
 
 @php
-    $textClasses = $theme === 'dark' 
-        ? 'text-blue-100 hover:text-white' 
+    $textClasses = $theme === 'dark'
+        ? 'text-blue-100 hover:text-white'
         : 'text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white';
-    
+
     $separatorClasses = $theme === 'dark'
         ? 'text-blue-200'
         : 'text-gray-400';
-        
+
     $currentClasses = $theme === 'dark'
         ? 'text-blue-200'
         : 'text-gray-500 dark:text-gray-400';
 @endphp
 
-<nav class="flex" aria-label="Breadcrumb">
+<nav class="flex mb-8" aria-label="Breadcrumb">
     <ol class="flex items-center space-x-2 text-sm">
         <!-- Home link -->
         <li>
@@ -28,7 +28,7 @@
                 Inicio
             </a>
         </li>
-        
+
         @foreach($items as $index => $item)
             <li>
                 <svg class="w-4 h-4 {{ $separatorClasses }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,7 +37,7 @@
             </li>
             <li @if($loop->last) aria-current="page" @endif>
                 @if($loop->last)
-                    <span class="{{ $currentClasses }} truncate max-w-xs">
+                    <span class="{{ $currentClasses }} truncate whitespace-normal max-w-xs">
                         {{ $item['label'] }}
                     </span>
                 @else
