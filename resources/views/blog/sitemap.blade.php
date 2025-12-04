@@ -14,7 +14,7 @@
         <loc>{{ route('blog.category', $category->slug) }}</loc>
         <lastmod>{{ $category->updated_at ? $category->updated_at->toISOString() : now()->toISOString() }}</lastmod>
         <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
+        <priority>0.7</priority>
     </url>
     @endforeach
 
@@ -24,17 +24,17 @@
         <loc>{{ route('blog.tag', $tag->slug) }}</loc>
         <lastmod>{{ $tag->updated_at ? $tag->updated_at->toISOString() : now()->toISOString() }}</lastmod>
         <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
+        <priority>0.5</priority>
     </url>
     @endforeach
 
     <!-- Articles -->
-    @foreach($articles as $article)
+    @foreach($articles as $index => $article)
     <url>
         <loc>{{ route('blog.show', $article->slug) }}</loc>
         <lastmod>{{ $article->updated_at ? $article->updated_at->toISOString() : now()->toISOString() }}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
+        <changefreq>{{ $index < 10 ? 'daily' : 'monthly' }}</changefreq>
+        <priority>{{ $index < 10 ? '0.9' : '0.5' }}</priority>
         
         <!-- Google News Sitemap -->
         <news:news>

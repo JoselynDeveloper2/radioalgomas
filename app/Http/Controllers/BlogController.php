@@ -181,6 +181,7 @@ class BlogController extends Controller
             ->published()
             ->select('slug', 'updated_at', 'published_at', 'title', 'excerpt', 'featured_image')
             ->latest('published_at')
+            ->limit(100) // Limitamos a 100 para asegurar que Google vea las más recientes y no se sature
             ->get();
 
         $categories = Category::active()
