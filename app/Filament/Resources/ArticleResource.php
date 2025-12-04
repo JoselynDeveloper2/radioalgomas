@@ -217,7 +217,9 @@ class ArticleResource extends Resource
                                         Forms\Components\Textarea::make('schema_markup')
                                             ->label('Schema Markup JSON-LD')
                                             ->helperText('Código JSON-LD para datos estructurados')
-                                            ->columnSpanFull(),
+                                            ->columnSpanFull()
+                                            ->formatStateUsing(fn ($state) => is_array($state) ? json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : $state)
+                                            ->dehydrateStateUsing(fn ($state) => is_string($state) ? json_decode($state, true) : $state),
                                     ]),
                             ]),
                         

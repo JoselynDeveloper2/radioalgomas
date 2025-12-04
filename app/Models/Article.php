@@ -179,7 +179,7 @@ class Article extends Model
 
     public function getCanonicalUrlAttribute($value): string
     {
-        return $value ?: url('/articulos/' . $this->slug);
+        return $value ?: route('blog.show', $this->slug);
     }
 
     // Métodos de utilidad
