@@ -226,8 +226,9 @@ class RssImportService
             $item['description'] = $this->cleanHtmlContent($item['description'] ?? '');
             $item['content'] = $this->cleanHtmlContent($item['content'] ?? $item['description'] ?? '');
             
-            // Generar external_id único
-            $item['external_id'] = md5($item['link'] . $item['title']);
+            // Generar external_id único (normalizando título)
+            $normalizedTitle = Str::slug($item['title']);
+            $item['external_id'] = md5($item['link'] . $normalizedTitle);
             
             $parsed[] = $item;
         }
@@ -240,16 +241,22 @@ class RssImportService
      */
     private function processRssItem(array $item, RssFeed $feed): string
     {
-        // Verificar si ya existe
+        // Verificar si ya existe por external_id
         $existingArticle = Article::where('rss_feed_id', $feed->id)
             ->where('external_id', $item['external_id'])
             ->first();
+
+        // Verificar también por URL directa para evitar duplicados si cambia el título
+        if (!$existingArticle) {
+            $existingArticle = Article::where('source_url', $item['link'])->first();
+        }
 
         if ($existingArticle) {
             Log::info('Artículo omitido: ya existe', [
                 'title' => $item['title'],
                 'external_id' => $item['external_id'],
-                'feed_id' => $feed->id
+                'feed_id' => $feed->id,
+                'existing_id' => $existingArticle->id
             ]);
             return 'skipped';
         }
