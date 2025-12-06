@@ -178,8 +178,7 @@
 
             <!-- Sidebar -->
             <aside class="lg:col-span-1">
-                <!-- Sidebar Ad -->
-                <x-ad-banner location="sidebar_article" />
+
 
                 <!-- Author Bio Box -->
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
@@ -228,6 +227,9 @@
                         </div>
                     </div>
                 @endif
+
+                <!-- Sidebar Ad (Moved to bottom) -->
+                <x-ad-banner location="sidebar_article" />
             </aside>
         </div>
     </div>
