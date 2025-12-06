@@ -417,7 +417,7 @@ class RssImportService
     private function cleanHtmlContent(string $content): string
     {
         // Limpiar tags HTML pero conservar estructura básica
-        $allowedTags = '<p><br><strong><b><em><i><u><a><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote>';
+        $allowedTags = '<p><br><strong><b><em><i><u><a><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><div><span><img><iframe>';
         $content = strip_tags($content, $allowedTags);
         
         // Limpiar atributos peligrosos
