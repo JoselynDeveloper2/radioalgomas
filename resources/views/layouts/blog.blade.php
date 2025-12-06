@@ -146,6 +146,13 @@
         </div>
     </header>
 
+    <!-- Header Ad -->
+    @if(!request()->routeIs('home'))
+    <div class="container mx-auto px-4 mt-6">
+        <x-ad-banner location="header" />
+    </div>
+    @endif
+
     <!-- Main Content -->
     <main>
         @yield('content')

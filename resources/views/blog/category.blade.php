@@ -112,6 +112,9 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Sidebar Ad -->
+            <x-ad-banner location="sidebar_category" />
         </aside>
     </div>
 </div>

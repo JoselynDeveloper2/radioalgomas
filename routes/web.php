@@ -59,4 +59,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 });
 
+Route::get('/ads/{ad}/click', [App\Http\Controllers\AdController::class, 'click'])->name('ads.click');
+
 require __DIR__.'/auth.php';
