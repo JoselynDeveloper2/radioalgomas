@@ -27,6 +27,8 @@ class Article extends Model
         'category_id',
         'user_id',
         'is_featured',
+        'featured_type',
+        'featured_until',
         // Campos RSS
         'rss_feed_id',
         'external_id',
@@ -54,6 +56,7 @@ class Article extends Model
         'schema_markup' => 'array',
         'is_imported' => 'boolean',
         'is_featured' => 'boolean',
+        'featured_until' => 'datetime',
         'import_metadata' => 'array'
     ];
 
@@ -297,27 +300,38 @@ class Article extends Model
                 });
             }
             
-            // Lógica para auto-destacar los últimos 3 artículos
-            if (($article->wasRecentlyCreated || $article->isDirty('status')) && $article->status === self::STATUS_PUBLISHED) {
-                // Marcar el artículo actual como destacado si no lo está ya
-                if (!$article->is_featured) {
-                    $article->withoutEvents(function () use ($article) {
-                        $article->update(['is_featured' => true]);
-                    });
-                }
-
-                // Obtener los IDs de los 3 artículos destacados más recientes
-                $latestFeaturedIds = static::published()
+            // Lógica para auto-destacar con prioridad
+            if (($article->wasRecentlyCreated || $article->isDirty('status') || $article->isDirty('is_featured') || $article->isDirty('featured_type')) && $article->status === self::STATUS_PUBLISHED) {
+                // Si el artículo se activa como destacado, verificar límites y limpiar
+                
+                // Obtener todos los artículos que pretenden ser destacados
+                $candidates = static::published()
                     ->featured()
-                    ->latest('published_at')
-                    ->take(3)
-                    ->pluck('id');
-
-                // Quitar el estado de "destacado" de los artículos más antiguos
-                if ($latestFeaturedIds->count() > 0) {
-                    static::withoutEvents(function () use ($latestFeaturedIds) {
+                    ->get();
+                
+                // Ordenar por prioridad
+                // 1. Permanentes
+                // 2. Por Tiempo Limitado Válidos
+                // 3. Estándar (Por fecha)
+                $sorted = $candidates->sortByDesc(function ($item) {
+                    if ($item->featured_type === 'permanent') return 3000000000;
+                    if ($item->featured_type === 'time_limited') {
+                        if ($item->featured_until && $item->featured_until->isFuture()) {
+                             return 2000000000 + $item->created_at->timestamp;
+                        }
+                        return 0; // Invalid, should be dropped
+                    }
+                    return 1000000000 + $item->published_at->timestamp;
+                });
+                
+                // Mantener los top 3
+                $keepIds = $sorted->take(3)->pluck('id');
+                
+                // Desmarcar los que quedaron fuera
+                if ($keepIds->isNotEmpty()) {
+                    static::withoutEvents(function () use ($keepIds) {
                         static::where('is_featured', true)
-                            ->whereNotIn('id', $latestFeaturedIds)
+                            ->whereNotIn('id', $keepIds)
                             ->update(['is_featured' => false]);
                     });
                 }

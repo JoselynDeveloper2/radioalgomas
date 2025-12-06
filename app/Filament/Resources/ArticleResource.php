@@ -76,7 +76,25 @@ class ArticleResource extends Resource
                                         
                                         Forms\Components\Toggle::make('is_featured')
                                             ->label('Artículo Destacado')
-                                            ->default(false),
+                                            ->default(false)
+                                            ->live(),
+
+                                        Forms\Components\Select::make('featured_type')
+                                            ->label('Tipo de Destacado')
+                                            ->options([
+                                                'standard' => 'Estándar (Rotación)',
+                                                'permanent' => 'Fijo (Permanente)',
+                                                'time_limited' => 'Por Tiempo Limitado',
+                                            ])
+                                            ->default('standard')
+                                            ->visible(fn (Forms\Get $get) => $get('is_featured'))
+                                            ->live()
+                                            ->required(fn (Forms\Get $get) => $get('is_featured')),
+
+                                        Forms\Components\DateTimePicker::make('featured_until')
+                                            ->label('Destacado Hasta')
+                                            ->visible(fn (Forms\Get $get) => $get('is_featured') && $get('featured_type') === 'time_limited')
+                                            ->required(fn (Forms\Get $get) => $get('is_featured') && $get('featured_type') === 'time_limited'),
                                     ])
                                     ->columns(2),
                                 

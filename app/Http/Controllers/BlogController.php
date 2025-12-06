@@ -199,43 +199,47 @@ class BlogController extends Controller
     /**
      * Obtener artículos destacados con prioridad para la categoría recién importada
      */
+    /**
+     * Obtener artículos destacados con prioridad
+     */
     private function getFeaturedArticlesWithRotation()
     {
-        // Buscar la categoría más recientemente importada (en los últimos 15 minutos)
-        $recentCategory = $this->getRecentlyImportedCategory();
-        
-        $featuredArticles = collect();
-        
-        if ($recentCategory) {
-            // Priorizar artículos de la categoría recién importada (máximo 2)
-            $categoryArticles = Article::with(['category', 'user'])
-                ->published()
-                ->where('category_id', $recentCategory->id)
-                ->latest('published_at')
-                ->take(2)
-                ->get();
+        // 1. Obtener candidatos marcados como destacados
+        $candidates = Article::with(['category', 'user'])
+            ->published()
+            ->featured()
+            ->get();
             
-            $featuredArticles = $featuredArticles->concat($categoryArticles);
+        // 2. Filtrar y ordenar
+        $featured = $candidates->filter(function ($article) {
+            // Filtrar time_limited expirados
+            if ($article->featured_type === 'time_limited' && $article->featured_until && $article->featured_until->isPast()) {
+                return false;
+            }
+            return true;
+        })->sortByDesc(function ($article) {
+            // Ranking de prioridad
+            if ($article->featured_type === 'permanent') return 3;
+            if ($article->featured_type === 'time_limited') return 2;
+            return 1; // standard
+        })->take(3);
+        
+        // 3. Rellenar si faltan
+        if ($featured->count() < 3) {
+            $excludeIds = $featured->pluck('id')->toArray();
+            $needed = 3 - $featured->count();
+            
+            $additional = Article::with(['category', 'user'])
+                ->published()
+                ->whereNotIn('id', $excludeIds)
+                ->latest('published_at')
+                ->take($needed)
+                ->get();
+                
+            $featured = $featured->concat($additional);
         }
         
-        // Completar con otros artículos destacados si no tenemos 3
-        if ($featuredArticles->count() < 3) {
-            $excludeIds = $featuredArticles->pluck('id')->toArray();
-            $remainingSlots = 3 - $featuredArticles->count();
-            
-            $otherArticles = Article::with(['category', 'user'])
-                ->published()
-                ->when(!empty($excludeIds), function($q) use ($excludeIds) {
-                    return $q->whereNotIn('id', $excludeIds);
-                })
-                ->latest('published_at')
-                ->take($remainingSlots)
-                ->get();
-            
-            $featuredArticles = $featuredArticles->concat($otherArticles);
-        }
-        
-        return $featuredArticles->take(3);
+        return $featured;
     }
 
     /**
