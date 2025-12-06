@@ -38,6 +38,7 @@ class AdResource extends Resource
                             ->label('Ubicación')
                             ->options([
                                 'header' => 'Cabecera (Header)',
+                                'sidebar_home' => 'Sidebar Inicio',
                                 'sidebar_category' => 'Barra Lateral (Categorías)',
                                 'sidebar_article' => 'Barra Lateral (Artículos)',
                                 'footer' => 'Pie de Página (Footer)',

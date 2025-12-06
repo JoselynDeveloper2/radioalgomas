@@ -132,6 +132,9 @@
                         </div>
                     </div>
                 @endif
+
+                <!-- Sidebar Ad -->
+                <x-ad-banner location="sidebar_home" />
             </aside>
         </div>
     </div>
