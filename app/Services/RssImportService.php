@@ -284,6 +284,7 @@ class RssImportService
                 'content' => $this->addSourceCredit($item['content'], $item['link'], $feed->name),
                 'featured_image' => $featuredImage,
                 'source_url' => $item['link'],
+                'canonical_url' => $item['link'], // Canonical pointing to original source
                 'external_id' => $item['external_id'],
                 'rss_feed_id' => $feed->id,
                 'category_id' => $feed->category_id,
