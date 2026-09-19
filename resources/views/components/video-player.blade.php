@@ -3,9 +3,10 @@
 @php
     use App\Models\Player;
     use App\Models\PlayerUrl;
-    
+
     // Get stream URL with fallback system
     $useProxy = false;
+    $activePlayerUrl = null;
     if (!$streamUrl) {
         // Try new PlayerUrl system first
         $activePlayerUrl = PlayerUrl::getActive();
@@ -15,14 +16,31 @@
             $streamUrl = $originalUrl;
             $useProxy = false; // Let Video.js handle CORS with configuration
         } else {
-            // Fallback to old Player system
-            $streamUrl = Player::getActiveStreamUrl();
+            // Fallback to old Player system (solo si hay un registro activo en BD)
+            $activePlayer = Player::where('is_active', true)->first();
+            $streamUrl = $activePlayer?->stream_url;
         }
     }
-    
+
+    // Si no hay stream activo en BD, reproducir cualquier .mp4 local de public/video/
+    $isLocalVideo = false;
+    if (!$streamUrl) {
+        $localVideos = glob(public_path('video/*.mp4')) ?: [];
+        if (!empty($localVideos)) {
+            sort($localVideos);
+            $streamUrl = asset('video/' . basename($localVideos[0]));
+            $isLocalVideo = true;
+        }
+    }
+
+    // Detectar el tipo de fuente: .mp4 -> video/mp4, resto -> HLS
+    $streamPath = $streamUrl ? (parse_url($streamUrl, PHP_URL_PATH) ?: $streamUrl) : '';
+    $isMp4 = $streamUrl && str_ends_with(strtolower($streamPath), '.mp4');
+    $sourceType = $isMp4 ? 'video/mp4' : 'application/x-mpegURL';
+
     // Additional metadata for enhanced player
     $playerMetadata = [];
-    if ($activePlayerUrl ?? false) {
+    if ($activePlayerUrl) {
         $playerMetadata = [
             'name' => $activePlayerUrl->name,
             'last_tested' => $activePlayerUrl->last_tested_at?->diffForHumans(),
@@ -45,6 +63,7 @@
                 height="{{ $height }}" 
                 autoplay
                 muted
+                loop
                 playsinline
                 crossorigin="anonymous"
                 data-setup='{}'>
@@ -69,21 +88,46 @@
             margin: 0 auto;
         }
         
+        /* Caja fija 16:9: el tamaño del contenedor NO depende de la
+           resolución de la fuente (HLS 16:9, mp4 cuadrado, vertical...). */
         .video-player-container .videocontent {
             position: relative;
             width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            overflow: hidden;
         }
-        
-        .video-js {
+
+        @supports not (aspect-ratio: 16 / 9) {
+            .video-player-container .videocontent::before {
+                content: '';
+                display: block;
+                padding-top: 56.25%;
+            }
+        }
+
+        .video-player-container .video-js {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100% !important;
-            height: auto !important;
+            height: 100% !important;
+            max-width: 100%;
         }
-        
-        .video-js .vjs-tech {
+
+        /* El video se ajusta dentro de la caja sin deformarla ni desbordarla */
+        .video-player-container .video-js .vjs-tech,
+        .video-player-container .video-js video {
             width: 100% !important;
-            height: auto !important;
+            height: 100% !important;
+            object-fit: contain;
+            background: #000;
         }
-        
+
+        .video-player-container .video-js .vjs-poster {
+            background-size: contain;
+        }
+
         @media (max-width: 768px) {
             .video-player-container {
                 margin-bottom: 1rem;
@@ -119,15 +163,29 @@
                     window.tucanaltv_player = null;
                 }
 
+                // Fuente activa resuelta en PHP (stream HLS de BD o .mp4 local)
+                const streamUrl = @json($streamUrl);
+                const sourceType = @json($sourceType);
+                const isMp4 = {{ $isMp4 ? 'true' : 'false' }};
+
+                if (!streamUrl) {
+                    console.warn('TuCanalTV: no hay stream activo ni video local en public/video/');
+                    return;
+                }
+
                 // Enhanced configuration for external HLS streams
                 const player = videojs('videojs_player', {
                     controls: true,
                     autoplay: true,
                     preload: 'auto',
                     muted: true,
+                    loop: true,
+                    // fill: el player ocupa la caja 16:9 del contenedor,
+                    // en vez de dimensionarse según la resolución de la fuente
                     fluid: false,
+                    fill: true,
                     responsive: true,
-                    liveui: true,
+                    liveui: !isMp4,
                     // Advanced HTML5 configuration for external streams
                     html5: {
                         vhs: {
@@ -161,27 +219,30 @@
                             responseTime: '{{ $playerMetadata['response_time'] ?? '' }}ms',
                             originalUrl: '{{ $playerMetadata['original_url'] ?? '' }}',
                             usingProxy: {{ $playerMetadata['using_proxy'] ? 'true' : 'false' }},
-                            streamUrl: '{{ $streamUrl }}'
+                            streamUrl: streamUrl
                         });
                     @endif
-                    
+
                     // Set source like in original project
                     player.src({
-                        src: '{{ $streamUrl }}',
-                        type: 'application/x-mpegURL',
+                        src: streamUrl,
+                        type: sourceType,
                         label: 'HD',
                         res: 1080
                     });
 
-                    // Ensure muted for autoplay
+                    // Ensure muted + loop for autoplay
                     player.muted(true);
+                    player.loop(true);
+                    player.play()?.catch(function(e) {
+                        console.log('Autoplay bloqueado por el navegador:', e);
+                    });
                 });
 
-                // Handle play event like original
-                player.on('play', function() {
-                    if (!player.currentTime() === 0) {
-                        player.src('{{ $streamUrl }}');
-                    }
+                // Bucle infinito: reiniciar si el navegador ignora el atributo loop
+                player.on('ended', function() {
+                    player.currentTime(0);
+                    player.play()?.catch(function() {});
                 });
 
                 // Enhanced error handling with different retry strategies
@@ -209,18 +270,18 @@
                             if (retryCount === 1) {
                                 // First retry: just reload the source
                                 player.src({
-                                    src: '{{ $streamUrl }}',
-                                    type: 'application/x-mpegURL'
+                                    src: streamUrl,
+                                    type: sourceType
                                 });
                             } else if (retryCount === 2) {
                                 // Second retry: try with different type hint
                                 player.src({
-                                    src: '{{ $streamUrl }}',
-                                    type: 'application/vnd.apple.mpegurl'
+                                    src: streamUrl,
+                                    type: isMp4 ? 'video/mp4' : 'application/vnd.apple.mpegurl'
                                 });
                             } else {
                                 // Final retry: minimal config
-                                player.src('{{ $streamUrl }}');
+                                player.src(streamUrl);
                             }
                             
                             player.load();
