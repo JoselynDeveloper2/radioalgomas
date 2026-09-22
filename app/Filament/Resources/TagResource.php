@@ -146,7 +146,7 @@ class TagResource extends Resource
 
                 Tables\Filters\Filter::make('popular')
                     ->label('Populares')
-                    ->query(fn (Builder $query): Builder => $query->withCount('publishedArticles')->having('published_articles_count', '>=', 5)),
+                    ->query(fn (Builder $query): Builder => $query->has('publishedArticles', '>=', 5)),
 
                 Tables\Filters\TrashedFilter::make(),
             ])

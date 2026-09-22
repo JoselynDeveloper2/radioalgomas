@@ -134,8 +134,8 @@ class Tag extends Model
     public static function getPopularTags(int $limit = 10): \Illuminate\Database\Eloquent\Collection
     {
         return static::active()
+                    ->has('publishedArticles')
                     ->withCount(['publishedArticles'])
-                    ->having('published_articles_count', '>', 0)
                     ->orderBy('published_articles_count', 'desc')
                     ->limit($limit)
                     ->get();

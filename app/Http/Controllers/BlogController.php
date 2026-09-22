@@ -58,7 +58,7 @@ class BlogController extends Controller
 
         $categories = Category::active()->ordered()->get();
         $popularTags = Tag::withCount(['publishedArticles'])
-            ->having('published_articles_count', '>', 0)
+            ->has('publishedArticles')
             ->orderBy('published_articles_count', 'desc')
             ->take(10)
             ->get();
@@ -147,7 +147,7 @@ class BlogController extends Controller
 
         $categories = Category::active()->ordered()->get();
         $popularTags = Tag::withCount(['publishedArticles'])
-            ->having('published_articles_count', '>', 0)
+            ->has('publishedArticles')
             ->orderBy('published_articles_count', 'desc')
             ->take(10)
             ->get();
