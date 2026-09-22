@@ -159,7 +159,7 @@
         </div>
 
         <div class="footer">
-            &copy; {{ date('Y') }} {{ config('app.name', 'TuCanalTV') }}
+            &copy; {{ date('Y') }} {{ config('app.name', 'Tucanaltv') }}
         </div>
     </div>
 

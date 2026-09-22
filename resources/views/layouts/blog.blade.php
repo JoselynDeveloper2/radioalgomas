@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', config('app.name', 'TuCanalTV'))</title>
-    <meta name="description" content="@yield('meta_description', 'TuCanalTV - Tu fuente confiable de noticias locales y actualidad')">
-    <meta name="keywords" content="@yield('meta_keywords', 'noticias, actualidad, deportes, entretenimiento, política, TuCanalTV')">
-    <meta name="author" content="TuCanalTV">
+    <title>@yield('title', config('app.name', 'Tucanaltv'))</title>
+    <meta name="description" content="@yield('meta_description', 'Tucanaltv - Tu fuente confiable de noticias locales y actualidad')">
+    <meta name="keywords" content="@yield('meta_keywords', 'noticias, actualidad, deportes, entretenimiento, política, Tucanaltv')">
+    <meta name="author" content="Tucanaltv">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('og_title', config('app.name'))">
-    <meta property="og:description" content="@yield('og_description', 'TuCanalTV - Tu fuente confiable de noticias locales y actualidad')">
+    <meta property="og:description" content="@yield('og_description', 'Tucanaltv - Tu fuente confiable de noticias locales y actualidad')">
     <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
     <meta property="og:site_name" content="{{ config('app.name') }}">
 
@@ -22,7 +22,7 @@
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
     <meta property="twitter:title" content="@yield('twitter_title', config('app.name'))">
-    <meta property="twitter:description" content="@yield('twitter_description', 'TuCanalTV - Tu fuente confiable de noticias locales y actualidad')">
+    <meta property="twitter:description" content="@yield('twitter_description', 'Tucanaltv - Tu fuente confiable de noticias locales y actualidad')">
     <meta property="twitter:image" content="@yield('twitter_image', asset('images/og-default.jpg'))">
 
     <!-- Canonical URL -->
@@ -72,7 +72,7 @@
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                        <img src="{{ asset('images/logo-tucanaltv-top.png') }}" alt="TuCanalTV Logo" class="h-auto w-auto">
+                        <img src="{{ asset('images/logo-tucanaltv-top.png') }}" alt="Tucanaltv Logo" class="h-auto w-auto">
                     </a>
                 </div>
 
@@ -165,7 +165,7 @@
                 <!-- Logo y Descripción -->
                 <div class="md:col-span-2">
                     <div class="flex items-center space-x-2 mb-4">
-                        <img src="{{ asset('images/logo-tucanaltv.jpeg') }}" alt="TuCanalTV Logo" class="h-32 w-auto">
+                        <img src="{{ asset('images/logo-tucanaltv.jpeg') }}" alt="Tucanaltv Logo" class="h-32 w-auto">
                     </div>
                     <p class="text-gray-300 mb-4 max-w-md">
                         Tu fuente confiable de noticias locales y actualidad. Mantente informado con las últimas noticias, deportes, entretenimiento y más.
@@ -217,7 +217,7 @@
 
             <div class="border-t border-gray-700 mt-8 pt-8 text-center">
                 <p class="text-gray-400">
-                    &copy; {{ date('Y') }} TuCanalTV. Todos los derechos reservados.
+                    &copy; {{ date('Y') }} Tucanaltv. Todos los derechos reservados.
                 </p>
             </div>
         </div>

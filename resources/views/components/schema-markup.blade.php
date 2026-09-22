@@ -21,7 +21,7 @@
             ],
             'publisher' => [
                 '@type' => 'Organization',
-                'name' => config('app.name', 'TuCanalTV'),
+                'name' => config('app.name', 'Tucanaltv'),
                 'logo' => [
                     '@type' => 'ImageObject',
                     'url' => asset('images/logo-tucanaltv.jpeg')

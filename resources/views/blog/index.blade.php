@@ -1,8 +1,8 @@
 @extends('layouts.blog')
 
-@section('title', 'TuCanalTV - Noticias y Actualidad')
+@section('title', 'Tucanaltv')
 @section('meta_description', 'Mantente informado con las últimas noticias locales, deportes, entretenimiento y más en
-    TuCanalTV.')
+    Tucanaltv.')
 
 @section('content')
     <div class="container mx-auto px-4 pb-28">

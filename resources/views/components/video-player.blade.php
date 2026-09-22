@@ -169,7 +169,7 @@
                 const isMp4 = {{ $isMp4 ? 'true' : 'false' }};
 
                 if (!streamUrl) {
-                    console.warn('TuCanalTV: no hay stream activo ni video local en public/video/');
+                    console.warn('Tucanaltv: no hay stream activo ni video local en public/video/');
                     return;
                 }
 
@@ -211,7 +211,7 @@
                 });
 
                 player.ready(function() {
-                    console.log('TuCanalTV Player Ready');
+                    console.log('Tucanaltv Player Ready');
                     @if(!empty($playerMetadata))
                         console.log('Stream Info:', {
                             name: '{{ $playerMetadata['name'] ?? '' }}',

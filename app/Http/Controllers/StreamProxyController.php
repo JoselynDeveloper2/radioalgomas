@@ -120,7 +120,7 @@ class StreamProxyController extends Controller
                 'Access-Control-Allow-Methods' => 'GET, HEAD, OPTIONS',
                 'Access-Control-Allow-Headers' => 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
                 'Cache-Control' => $response->header('Cache-Control', 'no-cache'),
-                'X-Proxy-Source' => 'TuCanalTV',
+                'X-Proxy-Source' => 'Tucanaltv',
             ]);
 
         } catch (\Exception $e) {

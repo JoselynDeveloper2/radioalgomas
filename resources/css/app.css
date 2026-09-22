@@ -24,7 +24,7 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    /* TuCanalTV Brand Colors */
+    /* Tucanaltv Brand Colors */
     --color-tucanaltv-blue: #007bff;
     --color-tucanaltv-blue-dark: #0056b3;
     --color-tucanaltv-blue-light: #66b3ff;
@@ -72,7 +72,7 @@ select:focus[data-flux-control] {
     @apply size-4;
 } */
 
-/* TuCanalTV Custom Styles */
+/* Tucanaltv Custom Styles */
 @layer components {
     .tucanaltv-header {
         @apply bg-tucanaltv-blue text-white;

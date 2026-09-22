@@ -27,7 +27,7 @@ class BlogSeeder extends Seeder
                 'email_verified_at' => now(),
                 'role' => User::ROLE_ADMIN,
                 'is_active' => true,
-                'bio' => 'Administrador principal del sitio web de TuCanalTV.',
+                'bio' => 'Administrador principal del sitio web de Tucanaltv.',
                 'website' => 'https://tucanaltv.tv',
             ]
         );
@@ -47,7 +47,7 @@ class BlogSeeder extends Seeder
         $author = User::firstOrCreate(
             ['email' => 'periodista@tucanaltv.tv'],
             [
-                'name' => 'Periodista TuCanalTV',
+                'name' => 'Periodista Tucanaltv',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'role' => User::ROLE_AUTHOR,
