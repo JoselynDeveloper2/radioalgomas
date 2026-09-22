@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Este ajuste de charset solo aplica a MySQL
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         // Asegurar que las tablas principales usen utf8mb4 para soportar emojis y caracteres especiales
         $tables = ['articles', 'categories', 'tags'];
         
