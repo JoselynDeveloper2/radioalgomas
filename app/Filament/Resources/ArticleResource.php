@@ -95,6 +95,12 @@ class ArticleResource extends Resource
                                             ->label('Destacado Hasta')
                                             ->visible(fn (Forms\Get $get) => $get('is_featured') && $get('featured_type') === 'time_limited')
                                             ->required(fn (Forms\Get $get) => $get('is_featured') && $get('featured_type') === 'time_limited'),
+
+                                        Forms\Components\Toggle::make('is_editorial')
+                                            ->label('Nota trabajada por la redacción')
+                                            ->helperText('Actívalo solo si la redacción amplió la nota con información propia (contexto local, declaraciones, datos). Google la atribuirá a Radio Algo Más en lugar de a la fuente original.')
+                                            ->visible(fn ($record) => $record?->is_imported)
+                                            ->columnSpanFull(),
                                     ])
                                     ->columns(2),
                                 
@@ -522,7 +528,14 @@ class ArticleResource extends Resource
                     ->tooltip(fn ($record) => $record->is_imported ? 'Importado desde RSS' : 'Creado manualmente')
                     ->alignCenter()
                     ->toggleable(),
-                
+
+                Tables\Columns\ToggleColumn::make('is_editorial')
+                    ->label('Redacción')
+                    ->tooltip('Nota trabajada por la redacción: Google la atribuye a Radio Algo Más')
+                    ->disabled(fn ($record) => ! $record->is_imported)
+                    ->alignCenter()
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('rssFeed.name')
                     ->label('Fuente RSS')
                     ->badge()

@@ -13,6 +13,17 @@ test('canonical URL recalculates stale self references and keeps external source
     'fuente original del RSS' => ['https://www.diariolibre.com/deportes/otra-nota-GD123', 'https://www.diariolibre.com/deportes/otra-nota-GD123'],
 ]);
 
+test('an imported article worked by the newsroom is canonical on the site, not the source', function () {
+    $article = (new Article())->forceFill([
+        'slug' => 'mi-nota',
+        'is_imported' => true,
+        'is_editorial' => true,
+        'canonical_url' => 'https://elpais.com/deportes/nota-original.html',
+    ]);
+
+    expect($article->publicCanonicalUrl())->toBe(route('blog.show', 'mi-nota'));
+});
+
 test('seo canonical override takes priority over the auto canonical', function () {
     $article = (new Article())->forceFill([
         'slug' => 'mi-nota',

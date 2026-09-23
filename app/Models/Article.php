@@ -35,6 +35,7 @@ class Article extends Model
         'external_id',
         'source_url',
         'is_imported',
+        'is_editorial',
         'import_metadata',
         // Campos SEO
         'meta_title',
@@ -56,6 +57,7 @@ class Article extends Model
         'rss_feed_id' => 'integer',
         'schema_markup' => 'array',
         'is_imported' => 'boolean',
+        'is_editorial' => 'boolean',
         'is_featured' => 'boolean',
         'featured_until' => 'datetime',
         'import_metadata' => 'array'
@@ -228,12 +230,17 @@ class Article extends Model
     }
 
     /**
-     * URL canónica a publicar. Las autogeneradas se guardaron con el dominio y la ruta del momento
-     * (incluso "/articulos/", que no existe), así que se recalculan; una externa (fuente del RSS) se respeta.
+     * URL canónica a publicar. Una nota trabajada por la redacción siempre es canónica en el sitio.
+     * Las autogeneradas se guardaron con el dominio y la ruta del momento (incluso "/articulos/",
+     * que no existe), así que se recalculan; una externa (fuente del RSS) se respeta.
      */
     public function publicCanonicalUrl(): string
     {
         $self = route('blog.show', $this->slug);
+
+        if ($this->is_editorial) {
+            return $self;
+        }
 
         foreach ([$this->seo_canonical_url, $this->canonical_url] as $url) {
             if (! $url) {
