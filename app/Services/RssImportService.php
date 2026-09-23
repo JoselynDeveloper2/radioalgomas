@@ -538,9 +538,9 @@ class RssImportService
         
         // Crear el crédito de la fuente
         $sourceCredit = '<hr style="margin: 2rem 0; border: none; border-top: 1px solid #e5e7eb;">' . PHP_EOL;
-        $sourceCredit .= '<div style="font-size: 0.875rem; color: #6b7280; padding: 1rem; background-color: #f9fafb; border-left: 4px solid #3b82f6; margin: 1rem 0;">' . PHP_EOL;
+        $sourceCredit .= '<div style="font-size: 0.875rem; color: #6b7280; padding: 1rem; background-color: #f8fafc; border-left: 4px solid #1B3A5C; margin: 1rem 0;">' . PHP_EOL;
         $sourceCredit .= '<p style="margin: 0;"><strong>Fuente:</strong> ';
-        $sourceCredit .= '<a href="' . htmlspecialchars($sourceUrl) . '" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: none;">';
+        $sourceCredit .= '<a href="' . htmlspecialchars($sourceUrl) . '" target="_blank" rel="noopener noreferrer" style="color: #1B3A5C; text-decoration: underline;">';
         $sourceCredit .= htmlspecialchars($domain);
         $sourceCredit .= '</a></p>' . PHP_EOL;
         $sourceCredit .= '</div>';

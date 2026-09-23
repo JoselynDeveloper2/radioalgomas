@@ -1,4 +1,4 @@
-@props(['article', 'variant' => 'grid', 'showCategory' => true]) {{-- lead | side | grid | feature --}}
+@props(['article', 'variant' => 'grid', 'showCategory' => true]) {{-- lead | side | grid | feature | compact --}}
 
 @php
     $url = route('blog.show', $article->slug);
@@ -16,6 +16,7 @@
         'lead' => 'text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight',
         'feature' => 'text-2xl lg:text-3xl font-bold tracking-tight',
         'side' => 'text-lg font-semibold',
+        'compact' => 'text-base font-bold line-clamp-2',
         default => 'text-lg font-bold',
     };
     $eager = in_array($variant, ['lead', 'feature']);
@@ -26,6 +27,7 @@
     'flex flex-col gap-4' => $variant === 'lead',
     'flex flex-col gap-4 sm:flex-row' => $variant === 'side',
     'flex h-full flex-col p-4' => $variant === 'grid',
+    'flex h-full flex-col' => $variant === 'compact',
     'grid grid-cols-1 border border-gray-200 lg:grid-cols-12 dark:border-gray-700' => $variant === 'feature',
 ]) }}>
     <a href="{{ $url }}" tabindex="-1" aria-hidden="true" class="block overflow-hidden bg-gray-100 dark:bg-gray-800 {{ $imageBox }}">
@@ -43,7 +45,7 @@
         'flex flex-col',
         'gap-3' => $variant === 'lead',
         'gap-1.5' => $variant === 'side',
-        'flex-1 gap-1.5 pt-3' => $variant === 'grid',
+        'flex-1 gap-1.5 pt-3' => in_array($variant, ['grid', 'compact']),
         'gap-3 border-t border-gray-200 p-6 lg:col-span-5 lg:border-l lg:border-t-0 lg:p-8 dark:border-gray-700' => $variant === 'feature',
     ])>
         @if ($variant === 'lead')
@@ -61,7 +63,7 @@
             <a href="{{ $url }}" class="hover:text-brand focus-visible:outline-2 focus-visible:outline-brand dark:hover:text-gray-300">{{ $article->title }}</a>
         </h3>
 
-        @if ($article->excerpt)
+        @if ($article->excerpt && $variant !== 'compact')
             <p @class([
                 'text-gray-600 dark:text-gray-400',
                 'text-base leading-relaxed line-clamp-3' => $variant === 'lead',
@@ -71,7 +73,9 @@
             ])>{{ $article->excerpt }}</p>
         @endif
 
-        @if ($variant === 'side')
+        @if ($variant === 'compact')
+            <time datetime="{{ $date->toIso8601String() }}" class="mt-auto text-xs text-gray-500 dark:text-gray-400">{{ $date->diffForHumans() }}</time>
+        @elseif ($variant === 'side')
             <p class="text-xs text-gray-500 dark:text-gray-400">Por {{ $author }} · <time datetime="{{ $date->toIso8601String() }}">{{ $date->diffForHumans() }}</time></p>
         @elseif (in_array($variant, ['grid', 'feature']))
             <p @class([

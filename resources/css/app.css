@@ -208,7 +208,7 @@ select:focus[data-flux-control] {
     
     /* Article prose improvements */
     .prose img {
-        @apply rounded-lg shadow-md max-w-full h-auto;
+        @apply max-w-full h-auto;
     }
     
     .prose h2, .prose h3, .prose h4 {

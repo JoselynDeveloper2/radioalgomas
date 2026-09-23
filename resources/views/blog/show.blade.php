@@ -20,228 +20,136 @@
         <x-schema-markup :article="$article" />
     @endpush
 
+@php
+    $url = route('blog.show', $article->slug);
+    $author = $article->user->name ?? 'Redacción';
+    $initials = mb_strtoupper(collect(explode(' ', trim($author)))->filter()->take(2)->map(fn ($word) => mb_substr($word, 0, 1))->join(''));
+    $shareLink = 'rounded p-1.5 text-gray-500 hover:text-brand focus-visible:outline-2 focus-visible:outline-brand dark:text-gray-400 dark:hover:text-white';
+@endphp
+
 @section('content')
-    <div class="container mx-auto px-4 pt-8 pb-28">
-        <!-- Breadcrumb -->
-        <nav class="mb-8">
+    <x-radio-bar />
+
+    <article class="pb-8">
+        <header class="mx-auto max-w-[760px] px-4 pb-6 pt-8 sm:pt-10">
             <x-breadcrumb :items="[
-                [
-                    'label' => $article->category->name,
-                    'url' => route('blog.category', $article->category->slug),
-                ],
-                [
-                    'label' => Str::limit($article->title, 50),
-                    'url' => null,
-                ],
+                ['label' => $article->category->name, 'url' => route('blog.category', $article->category->slug)],
+                ['label' => Str::limit($article->title, 40), 'url' => null],
             ]" />
-        </nav>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Main Content -->
-            <main class="lg:col-span-3">
-                <!-- Article Header -->
-                <header class="mb-8">
-                    <!-- Category Badge -->
-                    <div class="mb-4">
-                        <a href="{{ route('blog.category', $article->category->slug) }}"
-                            class="inline-block px-4 py-2 text-sm font-semibold rounded-full transition-colors"
-                            style="background-color: {{ $article->category->color }}20; color: {{ $article->category->color }}; border: 1px solid {{ $article->category->color }}40;">
-                            {{ $article->category->name }}
+            <a href="{{ route('blog.category', $article->category->slug) }}"
+                class="mt-4 inline-block border-l-4 pl-3 text-sm font-semibold text-brand hover:underline focus-visible:outline-2 focus-visible:outline-brand dark:text-white"
+                style="border-color: {{ $article->category->color }}">
+                {{ $article->category->name }}
+            </a>
+
+            <h1 class="mt-4 text-3xl font-bold leading-tight tracking-tight text-brand sm:text-4xl lg:text-[42px] lg:leading-[48px] dark:text-white">
+                {{ $article->title }}
+            </h1>
+
+            @if ($article->excerpt)
+                <p class="mt-5 text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-300">{{ $article->excerpt }}</p>
+            @endif
+
+            <div class="mt-6 flex flex-col justify-between gap-3 border-y border-gray-200 py-3 sm:flex-row sm:items-center dark:border-gray-700">
+                <p class="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="flex size-7 items-center justify-center bg-slate-100 text-[11px] font-bold text-brand dark:bg-gray-700 dark:text-white" aria-hidden="true">{{ $initials }}</span>
+                    <span class="font-medium text-gray-900 dark:text-white">Por {{ $author }}</span>
+                    <span aria-hidden="true">·</span>
+                    <time datetime="{{ $article->published_at->toIso8601String() }}">{{ $article->published_at->translatedFormat('j M Y') }}</time>
+                    <span aria-hidden="true">·</span>
+                    <span>{{ $article->reading_time }} min de lectura</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{{ number_format($article->views_count, 0, ',', '.') }} vistas</span>
+                </p>
+
+                <div class="flex items-center gap-1" role="group" aria-label="Compartir artículo">
+                    <a href="https://wa.me/?text={{ urlencode($article->title . ' ' . $url) }}" target="_blank" rel="noopener" aria-label="Compartir en WhatsApp" class="{{ $shareLink }}">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5 5 16a8.5 8.5 0 1 1 3 3Z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.1 1.8.9-.4 1.6c-3.9.3-8.4-4.2-8.1-8.1l1.6-.4.9 1.8Z"/></svg>
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($url) }}" target="_blank" rel="noopener" aria-label="Compartir en Facebook" class="{{ $shareLink }}">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V10H6.5v3.5H9V21h3.5v-7.5H15l.5-3.5h-3V7a1 1 0 0 1 1-1H15Z"/></svg>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode($url) }}" target="_blank" rel="noopener" aria-label="Compartir en X" class="{{ $shareLink }}">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 4 16 16M20 4 4 20"/></svg>
+                    </a>
+                    <button type="button" data-copy-link="{{ $url }}" aria-label="Copiar enlace" class="{{ $shareLink }} cursor-pointer">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+                    </button>
+                    <span data-copy-feedback class="text-xs text-gray-500 dark:text-gray-400" role="status"></span>
+                </div>
+            </div>
+        </header>
+
+        @if ($article->featured_image)
+            <figure class="mx-auto my-6 max-w-[1080px] px-4">
+                <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}"
+                    class="aspect-[16/9] w-full border border-gray-200 bg-gray-100 object-cover dark:border-gray-700 dark:bg-gray-800">
+            </figure>
+        @endif
+
+        <div class="prose prose-lg mx-auto max-w-[760px] px-4 py-4 text-gray-800 prose-headings:text-brand prose-a:text-brand prose-blockquote:border-brand prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:font-medium prose-blockquote:text-brand dark:prose-invert dark:text-gray-200 dark:prose-headings:text-white dark:prose-blockquote:bg-gray-800 dark:prose-blockquote:text-white">
+            {!! $article->content !!}
+        </div>
+
+        <footer class="mx-auto mt-10 flex max-w-[760px] flex-col gap-8 px-4">
+            @if ($article->tags->isNotEmpty())
+                <div class="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-6 dark:border-gray-700">
+                    <span class="mr-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Etiquetas:</span>
+                    @foreach ($article->tags as $tag)
+                        <a href="{{ route('blog.tag', $tag->slug) }}"
+                            class="border border-gray-200 bg-slate-50 px-3 py-1 text-sm font-medium text-brand hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-brand dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                            {{ $tag->name }}
                         </a>
-                    </div>
+                    @endforeach
+                </div>
+            @endif
 
-                    <!-- Title -->
-                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-                        {{ $article->title }}
-                    </h1>
-
-                    <!-- Excerpt -->
-                    @if ($article->excerpt)
-                        <p class="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-                            {{ $article->excerpt }}
-                        </p>
-                    @endif
-
-                    <!-- Article Meta -->
-                    <div class="flex flex-wrap items-center gap-6 text-sm text-gray-600 dark:text-gray-400 mb-6">
-                        <!-- Author -->
-                        <div class="flex items-center">
-                            <div
-                                class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    {{ substr($article->user->name, 0, 1) }}
-                                </span>
-                            </div>
-                            <div>
-                                <div class="font-medium text-gray-900 dark:text-white">{{ $article->user->name }}</div>
-                                @if ($article->user->bio)
-                                    <div class="text-xs">{{ Str::limit($article->user->bio, 50) }}</div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <!-- Publication Date -->
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            <time datetime="{{ $article->published_at->toISOString() }}">
-                                {{ $article->published_at->format('d M Y') }}
-                            </time>
-                        </div>
-
-                        <!-- Reading Time -->
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            {{ $article->reading_time }} min lectura
-                        </div>
-
-                        <!-- Views -->
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                </path>
-                            </svg>
-                            {{ number_format($article->views_count) }} vistas
-                        </div>
-                    </div>
-
-                    <!-- Social Share Buttons -->
-                    <div class="flex flex-wrap items-center gap-4 mb-8">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Compartir:</span>
-                        <a href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode(route('blog.show', $article->slug)) }}"
-                            target="_blank"
-                            class="flex items-center px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                            </svg>
-                            Twitter
-                        </a>
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.show', $article->slug)) }}"
-                            target="_blank"
-                            class="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                            </svg>
-                            Facebook
-                        </a>
-                        <a href="https://wa.me/?text={{ urlencode($article->title . ' ' . route('blog.show', $article->slug)) }}"
-                            target="_blank"
-                            class="flex items-center px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-                            </svg>
-                            WhatsApp
-                        </a>
-                    </div>
-                </header>
-
-                <!-- Featured Image -->
-                @if ($article->featured_image)
-                    <div class="mb-8">
-                        <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}"
-                            class="w-auto h-auto rounded-lg shadow-lg">
-                    </div>
-                @endif
-
-                <!-- Article Content -->
-                <article class="prose prose-lg dark:prose-invert max-w-full mb-12">
-                    {!! $article->content !!}
-                </article>
-
-                <!-- Tags -->
-                @if ($article->tags->count() > 0)
-                    <div class="mb-8">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Etiquetas</h3>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach ($article->tags as $tag)
-                                <a href="{{ route('blog.tag', $tag->slug) }}"
-                                    class="inline-block px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
-                                    {{ $tag->name }}
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-            </main>
-
-            <!-- Sidebar -->
-            <aside class="lg:col-span-1">
-
-
-                <!-- Author Bio Box -->
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Sobre el Autor</h3>
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                             <span class="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                                {{ substr($article->user->name, 0, 1) }}
-                            </span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white">{{ $article->user->name }}</h4>
-                        </div>
-                    </div>
-                    @if ($article->user->bio)
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{{ Str::limit($article->user->bio, 100) }}</p>
+            <section aria-labelledby="author-heading" class="flex flex-col items-start gap-5 border border-gray-200 p-6 sm:flex-row sm:items-center dark:border-gray-700">
+                <span class="flex size-16 shrink-0 items-center justify-center border border-gray-200 bg-slate-100 text-lg font-bold text-brand dark:border-gray-700 dark:bg-gray-700 dark:text-white" aria-hidden="true">{{ $initials }}</span>
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400">Sobre el autor</p>
+                    <h2 id="author-heading" class="mt-0.5 text-lg font-bold text-brand dark:text-white">{{ $author }}</h2>
+                    @if ($article->user?->bio)
+                        <p class="mt-1 text-sm leading-relaxed text-gray-600 dark:text-gray-400">{{ $article->user->bio }}</p>
                     @endif
                 </div>
+            </section>
 
-                <!-- Related Articles (Moved to Sidebar) -->
-                @if ($relatedArticles->count() > 0)
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Relacionados</h3>
-                        <div class="space-y-4">
-                            @foreach ($relatedArticles->take(3) as $relatedArticle)
-                                <div class="flex gap-3">
-                                    @if ($relatedArticle->featured_image)
-                                        <div class="w-16 h-16 flex-shrink-0">
-                                            <img src="{{ Storage::url($relatedArticle->featured_image) }}"
-                                                alt="{{ $relatedArticle->title }}"
-                                                class="w-full h-full object-cover rounded">
-                                        </div>
-                                    @endif
-                                    <div>
-                                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400">
-                                            <a href="{{ route('blog.show', $relatedArticle->slug) }}">
-                                                {{ $relatedArticle->title }}
-                                            </a>
-                                        </h4>
-                                        <time class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $relatedArticle->published_at->diffForHumans() }}
-                                        </time>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
+            <x-ad-banner location="sidebar_article" />
+        </footer>
+    </article>
 
-                <!-- Sidebar Ad (Moved to bottom) -->
-                <x-ad-banner location="sidebar_article" />
-            </aside>
-        </div>
-    </div>
+    @if ($relatedArticles->isNotEmpty())
+        <section aria-labelledby="more-news-title" class="border-t border-gray-200 bg-slate-50 dark:border-gray-700 dark:bg-gray-800/40">
+            <div class="container mx-auto px-4 py-12 sm:py-14">
+                <div class="mb-8 flex items-center justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
+                    <h2 id="more-news-title" class="text-2xl font-bold text-brand dark:text-white">Más noticias</h2>
+                    <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-gray-600 hover:text-brand focus-visible:outline-2 focus-visible:outline-brand dark:text-gray-300 dark:hover:text-white">
+                        Ver todas las publicaciones <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-gray-200 dark:lg:divide-gray-700">
+                    @foreach ($relatedArticles as $related)
+                        <x-news-card :article="$related" variant="compact" class="lg:px-5 lg:first:pl-0 lg:last:pr-0" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 @endsection
 
 @push('scripts')
     <script>
-        // Copy URL to clipboard
-        function copyUrl() {
-            navigator.clipboard.writeText(window.location.href).then(function() {
-                alert('URL copiada al portapapeles');
-            });
-        }
+        document.querySelector('[data-copy-link]')?.addEventListener('click', async (event) => {
+            const feedback = document.querySelector('[data-copy-feedback]');
+            try {
+                await navigator.clipboard.writeText(event.currentTarget.dataset.copyLink);
+                feedback.textContent = 'Enlace copiado';
+            } catch {
+                feedback.textContent = 'No se pudo copiar';
+            }
+            setTimeout(() => (feedback.textContent = ''), 2000);
+        });
     </script>
 @endpush
