@@ -84,7 +84,7 @@
         @if ($article->featured_image)
             <figure class="mx-auto my-6 max-w-[1000px] px-4">
                 <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}"
-                    class="h-auto w-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800">
+                    class="mx-auto h-auto w-auto max-w-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800">
             </figure>
         @endif
 
