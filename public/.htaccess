@@ -5,6 +5,16 @@
 
     RewriteEngine On
 
+    # Una sola versión del sitio para SEO: https://radioalgomas.com (sin www), con 301.
+    # Solo aplica al dominio de producción; en local (radioalgomas.test) no hace nada.
+    RewriteCond %{HTTP_HOST} ^(?:www\.)?radioalgomas\.com$ [NC]
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://radioalgomas.com%{REQUEST_URI} [L,R=301]
+
+    RewriteCond %{HTTP_HOST} ^www\.radioalgomas\.com$ [NC]
+    RewriteRule ^ https://radioalgomas.com%{REQUEST_URI} [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
