@@ -1,6 +1,23 @@
 const MAX_RETRIES = 3;
 const STALL_TIMEOUT_MS = 15000;
-const BARS = 24;
+const BAR_SPACING = 8; // px CSS por barra; la cantidad de barras sigue el ancho disponible
+
+/**
+ * Niveles 0–1 por barra a partir del espectro. Reparto por curva de potencia (más barras para
+ * medios y agudos, que es donde la música varía) y contraste para que no todo llegue al tope.
+ */
+export function spectrumLevels(bins, bars) {
+    const usable = Math.floor(bins.length * 0.75); // el último cuarto casi no tiene energía
+    const levels = new Array(bars);
+    for (let i = 0; i < bars; i++) {
+        const lo = Math.floor(1 + (usable - 1) * (i / bars) ** 1.5);
+        const hi = Math.max(lo + 1, Math.floor(1 + (usable - 1) * ((i + 1) / bars) ** 1.5));
+        let peak = 0;
+        for (let b = lo; b < hi; b++) peak = Math.max(peak, bins[b]);
+        levels[i] = Math.min(0.92, (peak / 255) ** 1.6);
+    }
+    return levels;
+}
 
 export function initRadioPlayer(root) {
     const $ = (selector) => root.querySelector(selector);
@@ -224,10 +241,11 @@ export function initRadioPlayer(root) {
         try {
             const source = audioCtx.createMediaElementSource(audio);
             analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64;
-            analyser.smoothingTimeConstant = 0.8;
+            analyser.fftSize = 256;
+            analyser.smoothingTimeConstant = 0.82;
             source.connect(analyser);
             analyser.connect(audioCtx.destination);
+            bins = new Uint8Array(analyser.frequencyBinCount);
             root.dataset.visualizer = 'live';
         } catch {
             analyser = null;
@@ -235,7 +253,7 @@ export function initRadioPlayer(root) {
     }
 
     const ctx2d = canvas.getContext('2d');
-    const bins = new Uint8Array(32);
+    let bins = null;
 
     function resizeCanvas() {
         const ratio = window.devicePixelRatio || 1;
@@ -248,15 +266,20 @@ export function initRadioPlayer(root) {
         frame = requestAnimationFrame(draw);
         analyser.getByteFrequencyData(bins);
         const { width, height } = canvas;
-        const slot = width / BARS;
-        const barWidth = slot * 0.6;
+        const ratio = window.devicePixelRatio || 1;
+        const bars = Math.max(24, Math.min(96, Math.floor(width / ratio / BAR_SPACING))) & ~1;
+        // Espejo: graves al centro y agudos hacia los lados, crecen desde la línea media.
+        const half = spectrumLevels(bins, bars / 2);
+        const levels = [...half.slice().reverse(), ...half];
+        const slot = width / bars;
+        const barWidth = Math.max(ratio, slot * 0.55);
+        const middle = height / 2;
         ctx2d.clearRect(0, 0, width, height);
-        for (let i = 0; i < BARS; i++) {
-            const level = bins[i] / 255;
-            const barHeight = Math.max(barWidth, level * height);
-            ctx2d.fillStyle = `rgba(255, 255, 255, ${0.35 + level * 0.65})`;
+        for (let i = 0; i < bars; i++) {
+            const barHeight = Math.max(barWidth, levels[i] * height);
+            ctx2d.fillStyle = `rgba(255, 255, 255, ${0.35 + levels[i] * 0.65})`;
             ctx2d.beginPath();
-            ctx2d.roundRect(i * slot, height - barHeight, barWidth, barHeight, barWidth / 2);
+            ctx2d.roundRect(i * slot + (slot - barWidth) / 2, middle - barHeight / 2, barWidth, barHeight, barWidth / 2);
             ctx2d.fill();
         }
     }

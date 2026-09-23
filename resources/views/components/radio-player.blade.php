@@ -38,11 +38,12 @@
                     <svg class="hidden size-9 animate-spin group-data-[state=loading]:block sm:size-10" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity=".2" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
                 </button>
 
-                <div class="relative h-14 max-w-xs flex-1 sm:h-16" aria-hidden="true">
-                    <div class="radio-eq absolute inset-0 flex items-end gap-1.5">
-                        @foreach ([40, 75, 55, 100, 65, 30, 85, 50, 80, 45, 70, 35] as $h)
-                            <span class="w-2 rounded-full bg-white/70" style="height: {{ $h }}%; --i: {{ $loop->index }}"></span>
-                        @endforeach
+                <div class="relative h-16 min-w-0 flex-1 sm:h-24" aria-hidden="true">
+                    <div class="radio-eq absolute inset-0 flex items-center justify-between gap-[3px]">
+                        @for ($i = 0; $i < 32; $i++)
+                            <span class="max-w-1.5 min-w-0 flex-1 rounded-full bg-white/70"
+                                style="height: {{ round(20 + 75 * abs(sin($i * 0.7) * cos($i * 0.23))) }}%; --i: {{ $i }}"></span>
+                        @endfor
                     </div>
                     <canvas data-radio-canvas class="radio-canvas absolute inset-0 size-full"></canvas>
                 </div>

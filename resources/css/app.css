@@ -106,36 +106,37 @@ select:focus[data-flux-control] {
         @apply text-xl font-bold text-white bg-radioalgomas-blue py-3 px-3 mb-2;
     }
 
-    /* Reproductor de radio */
-    .radio-live-dot {
-        animation: radio-pulse 1.8s ease-in-out infinite;
-    }
+}
 
+/* Reproductor de radio. Sin @layer a propósito: así gana a utilidades como `flex`. */
+.radio-live-dot {
+    animation: radio-pulse 1.8s ease-in-out infinite;
+}
+
+.radio-eq span {
+    transform-origin: center;
+    animation: radio-eq 0.9s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -0.13s);
+    animation-play-state: paused;
+}
+
+[data-radio-player][data-state='playing'] .radio-eq span {
+    animation-play-state: running;
+}
+
+.radio-canvas,
+[data-radio-player][data-visualizer='live'][data-state='playing'] .radio-eq {
+    display: none;
+}
+
+[data-radio-player][data-visualizer='live'][data-state='playing'] .radio-canvas {
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .radio-live-dot,
     .radio-eq span {
-        transform-origin: bottom;
-        animation: radio-eq 0.9s ease-in-out infinite alternate;
-        animation-delay: calc(var(--i) * -0.13s);
-        animation-play-state: paused;
-    }
-
-    [data-radio-player][data-state='playing'] .radio-eq span {
-        animation-play-state: running;
-    }
-
-    .radio-canvas,
-    [data-radio-player][data-visualizer='live'][data-state='playing'] .radio-eq {
-        display: none;
-    }
-
-    [data-radio-player][data-visualizer='live'][data-state='playing'] .radio-canvas {
-        display: block;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .radio-live-dot,
-        .radio-eq span {
-            animation: none;
-        }
+        animation: none;
     }
 }
 
