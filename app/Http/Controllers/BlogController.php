@@ -222,12 +222,12 @@ class BlogController extends Controller
             if ($article->featured_type === 'permanent') return 3;
             if ($article->featured_type === 'time_limited') return 2;
             return 1; // standard
-        })->take(3);
-        
+        })->take(4);
+
         // 3. Rellenar si faltan
-        if ($featured->count() < 3) {
+        if ($featured->count() < 4) {
             $excludeIds = $featured->pluck('id')->toArray();
-            $needed = 3 - $featured->count();
+            $needed = 4 - $featured->count();
             
             $additional = Article::with(['category', 'user'])
                 ->published()
