@@ -82,11 +82,11 @@
                     <a href="{{ route('home') }}" class="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-white transition-colors {{ request()->routeIs('home') ? 'text-brand dark:text-white font-semibold' : '' }}">
                         Inicio
                     </a>
-                    {{-- @foreach($categories ?? [] as $category)
-                    <a href="{{ route('blog.category', $category->slug) }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors {{ request()->route('slug') === $category->slug ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    @foreach($categories ?? [] as $category)
+                    <a href="{{ route('blog.category', $category->slug) }}" class="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-white transition-colors {{ request()->route('slug') === $category->slug ? 'text-brand dark:text-white font-semibold' : '' }}">
                         {{ $category->name }}
                     </a>
-                    @endforeach --}}
+                    @endforeach
                 </nav>
 
                 <!-- Search & Theme Toggle -->
@@ -137,11 +137,11 @@
                     <a href="{{ route('home') }}" class="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-white transition-colors {{ request()->routeIs('home') ? 'text-brand dark:text-white font-semibold' : '' }}">
                         Inicio
                     </a>
-                    {{-- @foreach($categories ?? [] as $category)
-                    <a href="{{ route('blog.category', $category->slug) }}" class="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors {{ request()->route('slug') === $category->slug ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    @foreach($categories ?? [] as $category)
+                    <a href="{{ route('blog.category', $category->slug) }}" class="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-white transition-colors {{ request()->route('slug') === $category->slug ? 'text-brand dark:text-white font-semibold' : '' }}">
                         {{ $category->name }}
                     </a>
-                    @endforeach --}}
+                    @endforeach
                 </nav>
             </div>
         </div>
