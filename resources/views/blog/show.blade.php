@@ -31,7 +31,7 @@
     <x-radio-bar />
 
     <article class="pb-8">
-        <header class="mx-auto max-w-[760px] px-4 pb-6 pt-8 sm:pt-10">
+        <header class="mx-auto max-w-[1000px] px-4 pb-6 pt-8 sm:pt-10">
             <x-breadcrumb :items="[
                 ['label' => $article->category->name, 'url' => route('blog.category', $article->category->slug)],
                 ['label' => Str::limit($article->title, 40), 'url' => null],
@@ -82,17 +82,17 @@
         </header>
 
         @if ($article->featured_image)
-            <figure class="mx-auto my-6 max-w-[1080px] px-4">
+            <figure class="mx-auto my-6 max-w-[1000px] px-4">
                 <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}"
-                    class="aspect-[16/9] w-full border border-gray-200 bg-gray-100 object-cover dark:border-gray-700 dark:bg-gray-800">
+                    class="h-auto w-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800">
             </figure>
         @endif
 
-        <div class="prose prose-lg mx-auto max-w-[760px] px-4 py-4 text-gray-800 prose-headings:text-brand prose-a:text-brand prose-blockquote:border-brand prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:font-medium prose-blockquote:text-brand dark:prose-invert dark:text-gray-200 dark:prose-headings:text-white dark:prose-blockquote:bg-gray-800 dark:prose-blockquote:text-white">
+        <div class="prose prose-lg mx-auto max-w-[1000px] px-4 py-4 text-gray-800 prose-headings:text-brand prose-a:text-brand prose-blockquote:border-brand prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:font-medium prose-blockquote:text-brand dark:prose-invert dark:text-gray-200 dark:prose-headings:text-white dark:prose-blockquote:bg-gray-800 dark:prose-blockquote:text-white">
             {!! $article->content !!}
         </div>
 
-        <footer class="mx-auto mt-10 flex max-w-[760px] flex-col gap-8 px-4">
+        <footer class="mx-auto mt-10 flex max-w-[1000px] flex-col gap-8 px-4">
             @if ($article->tags->isNotEmpty())
                 <div class="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-6 dark:border-gray-700">
                     <span class="mr-1 text-xs font-semibold text-gray-500 dark:text-gray-400">Etiquetas:</span>
