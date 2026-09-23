@@ -45,7 +45,7 @@
 
         <div class="text-sm text-gray-500">
             <p>Si el problema persiste, puedes contactarnos en: 
-               <a href="mailto:soporte@tucanaltv.tv" class="text-red-600 hover:text-red-800">soporte@tucanaltv.tv</a>
+               <a href="mailto:soporte@radioalgomas.com" class="text-red-600 hover:text-red-800">soporte@radioalgomas.com</a>
             </p>
         </div>
     </div>

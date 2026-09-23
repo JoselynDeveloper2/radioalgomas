@@ -86,7 +86,7 @@ class ShieldSeeder extends Seeder
         }
 
         // Asignar super admin al usuario admin principal
-        $adminUser = User::where('email', 'admin@tucanaltv.tv')->first();
+        $adminUser = User::where('email', 'admin@radioalgomas.com')->first();
         if ($adminUser) {
             $adminUser->syncRoles(['super_admin']);
         }

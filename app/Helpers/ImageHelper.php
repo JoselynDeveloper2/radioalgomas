@@ -59,7 +59,7 @@ class ImageHelper
      */
     public static function getBrandedPlaceholder($width = 600, $height = 400): string
     {
-        // Tucanaltv brand colors - very subtle
-        return "https://placehold.co/{$width}x{$height}/f8fafc/007bff?text=Tucanaltv";
+        // RadioAlgoMas brand colors - very subtle
+        return "https://placehold.co/{$width}x{$height}/f8fafc/007bff?text=RadioAlgoMas";
     }
 }

@@ -38,7 +38,7 @@ class SimpleStreamProxyController extends Controller
             $response = Http::timeout(30)
                 ->withOptions(['verify' => false])
                 ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (compatible; Tucanaltv-Proxy/1.0)',
+                    'User-Agent' => 'Mozilla/5.0 (compatible; RadioAlgoMas-Proxy/1.0)',
                     'Accept' => '*/*',
                 ])
                 ->get($url);

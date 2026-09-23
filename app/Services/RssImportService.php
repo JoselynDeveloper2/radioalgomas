@@ -26,7 +26,7 @@ class RssImportService
     public function __construct()
     {
         // Configurar timeout para Feeds
-        ini_set('user_agent', 'Tucanaltv RSS Bot/1.0 (compatible)');
+        ini_set('user_agent', 'RadioAlgoMas RSS Bot/1.0 (compatible)');
     }
 
     /**

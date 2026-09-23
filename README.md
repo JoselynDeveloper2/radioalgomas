@@ -1,6 +1,6 @@
-# Tucanaltv
+# RadioAlgoMas
 
-Plataforma interna del portal de noticias **Tucanaltv**: blog/actualidad, reproducción de video en vivo, ingesta automática de contenido vía RSS y panel de administración.
+Plataforma interna del portal de noticias **RadioAlgoMas**: blog/actualidad, reproducción de video en vivo, ingesta automática de contenido vía RSS y panel de administración.
 
 > Repositorio privado. El contenido y las credenciales de producción no deben exponerse fuera del equipo autorizado.
 
@@ -24,7 +24,7 @@ Plataforma interna del portal de noticias **Tucanaltv**: blog/actualidad, reprod
 
 ## Descripción general
 
-Tucanaltv es un portal de noticias con las siguientes capacidades:
+RadioAlgoMas es un portal de noticias con las siguientes capacidades:
 
 - **Publicación de contenido**: artículos con categorías, etiquetas, artículos destacados (permanentes o por tiempo limitado), búsqueda y paginación.
 - **Streaming en vivo**: reproductor basado en Video.js/HLS con un proxy propio que evita problemas de CORS y expone el stream activo.
@@ -79,8 +79,8 @@ Componentes destacados:
 
 ```bash
 # 1. Clonar el repositorio
-git clone <url-del-repositorio> tucanaltv
-cd tucanaltv
+git clone <url-del-repositorio> radioalgomas
+cd radioalgomas
 
 # 2. Configurar acceso al repositorio privado de Flux UI
 composer config http-basic.composer.fluxui.dev "<usuario>" "<licencia>"
@@ -232,8 +232,8 @@ php artisan queue:restart
 
 ## Propiedad y contacto
 
-- Equipo responsable: Tucanaltv
-- Canal de soporte / incidencias: Tucanaltv
-- Documentación interna adicional: Tucanaltv
+- Equipo responsable: RadioAlgoMas
+- Canal de soporte / incidencias: RadioAlgoMas
+- Documentación interna adicional: RadioAlgoMas
 
 Repositorio privado de uso interno. Todos los derechos reservados.

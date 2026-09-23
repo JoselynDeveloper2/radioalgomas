@@ -20,20 +20,20 @@ class BlogSeeder extends Seeder
     {
         // Crear usuarios
         $admin = User::firstOrCreate(
-            ['email' => 'admin@tucanaltv.tv'],
+            ['email' => 'admin@radioalgomas.com'],
             [
                 'name' => 'Administrador',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'role' => User::ROLE_ADMIN,
                 'is_active' => true,
-                'bio' => 'Administrador principal del sitio web de Tucanaltv.',
-                'website' => 'https://tucanaltv.tv',
+                'bio' => 'Administrador principal del sitio web de RadioAlgoMas.',
+                'website' => 'https://radioalgomas.com',
             ]
         );
 
         $editor = User::firstOrCreate(
-            ['email' => 'editor@tucanaltv.tv'],
+            ['email' => 'editor@radioalgomas.com'],
             [
                 'name' => 'Editor Principal',
                 'password' => Hash::make('password'),
@@ -45,9 +45,9 @@ class BlogSeeder extends Seeder
         );
 
         $author = User::firstOrCreate(
-            ['email' => 'periodista@tucanaltv.tv'],
+            ['email' => 'periodista@radioalgomas.com'],
             [
-                'name' => 'Periodista Tucanaltv',
+                'name' => 'Periodista RadioAlgoMas',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'role' => User::ROLE_AUTHOR,

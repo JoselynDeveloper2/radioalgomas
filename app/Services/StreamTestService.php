@@ -50,7 +50,7 @@ class StreamTestService
             $response = Http::timeout($this->timeout)
                 ->connectTimeout($this->connectionTimeout)
                 ->withHeaders([
-                    'User-Agent' => 'Tucanaltv Stream Tester/1.0',
+                    'User-Agent' => 'RadioAlgoMas Stream Tester/1.0',
                     'Accept' => '*/*'
                 ])
                 ->get($url);

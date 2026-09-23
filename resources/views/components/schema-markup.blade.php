@@ -21,10 +21,10 @@
             ],
             'publisher' => [
                 '@type' => 'Organization',
-                'name' => config('app.name', 'Tucanaltv'),
+                'name' => config('app.name', 'RadioAlgoMas'),
                 'logo' => [
                     '@type' => 'ImageObject',
-                    'url' => asset('images/logo-tucanaltv.jpeg')
+                    'url' => asset('images/radioalgomas-logo-3-insignia.svg')
                 ]
             ],
             'datePublished' => $article->published_at?->toISOString(),

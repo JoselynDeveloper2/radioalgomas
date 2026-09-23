@@ -141,11 +141,11 @@
     <script>
         (function() {
             // Avoid multiple initializations
-            if (window.tucanaltv_player_initialized) {
+            if (window.radioalgomas_player_initialized) {
                 return;
             }
             
-            window.tucanaltv_player_initialized = true;
+            window.radioalgomas_player_initialized = true;
 
             function initializePlayer() {
                 const playerElement = document.getElementById('videojs_player');
@@ -154,13 +154,13 @@
                 }
 
                 // Dispose previous player if exists
-                if (window.tucanaltv_player) {
+                if (window.radioalgomas_player) {
                     try {
-                        window.tucanaltv_player.dispose();
+                        window.radioalgomas_player.dispose();
                     } catch (e) {
                         console.log('Error disposing previous player:', e);
                     }
-                    window.tucanaltv_player = null;
+                    window.radioalgomas_player = null;
                 }
 
                 // Fuente activa resuelta en PHP (stream HLS de BD o .mp4 local)
@@ -169,7 +169,7 @@
                 const isMp4 = {{ $isMp4 ? 'true' : 'false' }};
 
                 if (!streamUrl) {
-                    console.warn('Tucanaltv: no hay stream activo ni video local en public/video/');
+                    console.warn('RadioAlgoMas: no hay stream activo ni video local en public/video/');
                     return;
                 }
 
@@ -211,7 +211,7 @@
                 });
 
                 player.ready(function() {
-                    console.log('Tucanaltv Player Ready');
+                    console.log('RadioAlgoMas Player Ready');
                     @if(!empty($playerMetadata))
                         console.log('Stream Info:', {
                             name: '{{ $playerMetadata['name'] ?? '' }}',
@@ -321,7 +321,7 @@
                 });
 
                 // Store globally
-                window.tucanaltv_player = player;
+                window.radioalgomas_player = player;
             }
 
             // Initialize when DOM is ready

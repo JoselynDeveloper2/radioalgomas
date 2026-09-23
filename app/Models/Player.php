@@ -35,7 +35,7 @@ class Player extends Model
         
         return $activePlayer 
             ? $activePlayer->stream_url 
-            : 'https://ott1.tucanaltv.tv/live_abr/tucanaltv/playlist.m3u8';
+            : '';
     }
 
     /**

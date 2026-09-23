@@ -1,7 +1,7 @@
 @extends('layouts.blog')
 
 @section('title', 'Página no encontrada - 404')
-@section('meta_description', 'La página que buscas no existe o ha sido movida. Explora nuestro contenido en Tucanaltv.')
+@section('meta_description', 'La página que buscas no existe o ha sido movida. Explora nuestro contenido en RadioAlgoMas.')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-12">
@@ -108,7 +108,7 @@
             <div class="mt-2 flex justify-center space-x-4">
                 <a href="{{ route('blog.index') }}" class="hover:text-blue-600 transition-colors">Inicio</a>
                 <span>•</span>
-                <a href="mailto:contacto@tucanaltv.tv" class="hover:text-blue-600 transition-colors">Contacto</a>
+                <a href="mailto:contacto@radioalgomas.com" class="hover:text-blue-600 transition-colors">Contacto</a>
             </div>
         </div>
     </div>

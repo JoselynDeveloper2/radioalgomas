@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('players', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->default('Tucanaltv Live Stream');
+            $table->string('name')->default('RadioAlgoMas Live Stream');
             $table->string('stream_url');
             $table->boolean('is_active')->default(true);
             $table->string('backup_url')->nullable();
