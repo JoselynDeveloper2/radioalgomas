@@ -30,7 +30,7 @@
             <div class="flex flex-col gap-2 sm:gap-3">
                 <div class="flex items-center gap-3 text-xs">
                     <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-medium">
-                        <span class="radio-live-dot size-2 rounded-full bg-red-500" aria-hidden="true"></span>
+                        <span class="radio-live-dot size-2 rounded-full bg-red-500 group-data-[state=playing]:bg-emerald-400" aria-hidden="true"></span>
                         En vivo
                     </span>
                     <span class="text-white/70">{{ $settings->station_name }}</span>
