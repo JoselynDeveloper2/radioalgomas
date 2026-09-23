@@ -1,139 +1,113 @@
 @extends('layouts.blog')
 
-@section('title', 'Tucanaltv')
+@section('title', 'RadioAlgoMas')
 @section('meta_description', 'Mantente informado con las últimas noticias locales, deportes, entretenimiento y más en
-    Tucanaltv.')
+    RadioAlgoMas.')
 
 @section('content')
-    <div class="container mx-auto px-4 pb-28">
-        <!-- Reproductor de Video en Vivo -->
-        <section class="mb-8 mt-2">
-            <x-video-player />
-        </section>
+    <div class="container mx-auto flex flex-col gap-12 px-4 pb-24 pt-4 sm:pt-6">
+        <h1 class="sr-only">{{ config('radio.name') }}: radio en vivo y noticias</h1>
 
-        <!-- Hero Section con Artículos Destacados -->
-        @if ($featuredArticles->count() > 0)
-            <section class="mb-12">
-                <div class="tucanaltv-featured-title">
-                    <h2>Noticias Destacadas</h2>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    @foreach ($featuredArticles as $index => $article)
-                        <x-article-card :article="$article" :layout="'default'" :show-author="true" :show-excerpt="true"
-                            :show-category="true" />
-                    @endforeach
+        <x-radio-player />
+
+        @if ($featuredArticles->isNotEmpty())
+            <section aria-labelledby="featured-title">
+                <h2 id="featured-title" class="mb-6 border-b border-gray-200 pb-2 text-xl font-bold text-brand dark:border-gray-700 dark:text-white">
+                    Noticias destacadas
+                </h2>
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
+                    <x-news-card :article="$featuredArticles->first()" variant="lead"
+                        class="lg:col-span-7 lg:border-r lg:border-gray-200 lg:pr-8 dark:lg:border-gray-700" />
+                    @if ($featuredArticles->count() > 1)
+                        <div class="flex flex-col divide-y divide-gray-200 lg:col-span-5 dark:divide-gray-700">
+                            @foreach ($featuredArticles->skip(1) as $article)
+                                <x-news-card :article="$article" variant="side" class="py-6 first:pt-0" />
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </section>
         @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Contenido Principal -->
-            <main class="lg:col-span-3">
-                <!-- Filtros y Búsqueda -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-                    <form method="GET" action="{{ route('blog.index') }}" class="flex flex-col md:flex-row gap-4">
-                        <div class="flex-1">
-                            <input type="text" name="search" value="{{ request('search') }}"
-                                placeholder="Buscar noticias..."
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
-                        </div>
-                        <div class="flex gap-2">
-                            <button type="submit" class="tucanaltv-btn-primary">
-                                Buscar
+        <div class="grid grid-cols-1 gap-8 border-t border-gray-200 pt-10 lg:grid-cols-12 dark:border-gray-700">
+            <section class="flex flex-col gap-8 lg:col-span-9" aria-labelledby="latest-title">
+                <form method="GET" action="{{ route('blog.index') }}" role="search"
+                    class="flex flex-col gap-3 border border-gray-200 bg-gray-50 p-4 sm:flex-row dark:border-gray-700 dark:bg-gray-800">
+                    <label for="home-search" class="sr-only">Buscar noticias</label>
+                    <input id="home-search" type="search" name="search" value="{{ request('search') }}" placeholder="Buscar noticias…"
+                        class="w-full flex-1 border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <div class="flex gap-2">
+                        <button type="submit" class="radioalgomas-btn-primary cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+                            Buscar
+                        </button>
+                        @if (request()->hasAny(['search', 'category', 'tag']))
+                            <a href="{{ route('blog.index') }}" class="radioalgomas-btn-secondary">Limpiar</a>
+                        @endif
+                    </div>
+                </form>
+
+                <h2 id="latest-title" class="border-b border-gray-200 pb-2 text-xl font-bold text-brand dark:border-gray-700 dark:text-white">
+                    Últimas noticias
+                </h2>
+
+                @if ($articles->isNotEmpty())
+                    <div class="grid grid-cols-1 border-l border-t border-gray-200 md:grid-cols-3 dark:border-gray-700">
+                        @foreach ($articles as $article)
+                            <x-news-card :article="$article" class="border-b border-r border-gray-200 dark:border-gray-700" />
+                        @endforeach
+                    </div>
+                @else
+                    <div class="py-16 text-center text-gray-500 dark:text-gray-400">
+                        <h3 class="mb-3 text-2xl font-semibold text-gray-900 dark:text-white">No se encontraron artículos</h3>
+                        <p class="mx-auto mb-6 max-w-md text-lg">Intenta con otros términos de búsqueda o explora nuestras categorías disponibles.</p>
+                        <div class="flex flex-col justify-center gap-3 sm:flex-row">
+                            <a href="{{ route('blog.index') }}" class="radioalgomas-btn-primary">Ver todos los artículos</a>
+                            <button type="button" onclick="document.getElementById('home-search').focus()" class="radioalgomas-btn-secondary cursor-pointer">
+                                Nueva búsqueda
                             </button>
-                            @if (request()->hasAny(['search', 'category', 'tag']))
-                                <a href="{{ route('blog.index') }}" class="tucanaltv-btn-secondary">
-                                    Limpiar
-                                </a>
-                            @endif
                         </div>
-                    </form>
-                </div>
-
-                <!-- Lista de Artículos -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    @forelse($articles as $article)
-                        <x-article-card :article="$article" layout="default" :show-author="true" :show-excerpt="true"
-                            :show-category="true" />
-                    @empty
-                        <div class="col-span-2 text-center py-16">
-                            <div class="text-gray-500 dark:text-gray-400">
-                                <div
-                                    class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-2xl font-semibold mb-3 text-gray-900 dark:text-white">No se encontraron
-                                    artículos</h3>
-                                <p class="text-lg mb-6 max-w-md mx-auto">Intenta con otros términos de búsqueda o explora
-                                    nuestras categorías disponibles.</p>
-                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                    <a href="{{ route('blog.index') }}" class="tucanaltv-btn-primary">
-                                        Ver todos los artículos
-                                    </a>
-                                    <button
-                                        onclick="document.getElementById('searchBar').classList.remove('hidden'); document.querySelector('#searchBar input').focus();"
-                                        class="tucanaltv-btn-secondary">
-                                        Nueva búsqueda
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    @endforelse
-                </div>
-
-                <!-- Paginación -->
-                @if ($articles->hasPages())
-                    <div class="mt-8">
-                        {{ $articles->links() }}
                     </div>
                 @endif
-            </main>
 
-            <!-- Sidebar -->
-            <aside class="lg:col-span-1">
-                <!-- Categorías -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Categorías</h3>
-                    <ul class="space-y-2">
+                @if ($articles->hasPages())
+                    <div>{{ $articles->links() }}</div>
+                @endif
+            </section>
+
+            <aside class="flex flex-col gap-8 lg:col-span-3">
+                <section aria-labelledby="categories-title" class="border border-gray-200 p-5 dark:border-gray-700">
+                    <h2 id="categories-title" class="mb-2 border-b border-gray-200 pb-3 text-base font-bold text-brand dark:border-gray-700 dark:text-white">Categorías</h2>
+                    <ul class="divide-y divide-gray-100 text-sm dark:divide-gray-700">
                         @foreach ($categories as $category)
                             <li>
                                 <a href="{{ route('blog.category', $category->slug) }}"
-                                    class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                    <div class="flex items-center">
-                                        <div class="w-3 h-3 rounded-full mr-3"
-                                            style="background-color: {{ $category->color }}"></div>
-                                        <span class="text-gray-700 dark:text-gray-300">{{ $category->name }}</span>
-                                    </div>
-                                    <span
-                                        class="text-sm text-gray-500 dark:text-gray-400">{{ $category->articles_count }}</span>
+                                    class="flex items-center justify-between gap-2 py-2.5 text-gray-700 hover:text-brand focus-visible:outline-2 focus-visible:outline-brand dark:text-gray-300 dark:hover:text-white">
+                                    <span class="flex items-center gap-2.5">
+                                        <span class="size-2 shrink-0 rounded-full" style="background-color: {{ $category->color }}" aria-hidden="true"></span>
+                                        {{ $category->name }}
+                                    </span>
+                                    <span class="bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-700 dark:text-gray-300">{{ $category->articles_count }}</span>
                                 </a>
                             </li>
                         @endforeach
                     </ul>
-                </div>
+                </section>
 
-                <!-- Etiquetas Populares -->
                 @if ($popularTags->count() > 0)
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Etiquetas Populares</h3>
-                        <div class="flex flex-wrap gap-2">
+                    <section aria-labelledby="tags-title" class="border border-gray-200 p-5 dark:border-gray-700">
+                        <h2 id="tags-title" class="mb-4 border-b border-gray-200 pb-3 text-base font-bold text-brand dark:border-gray-700 dark:text-white">Etiquetas populares</h2>
+                        <div class="flex flex-wrap gap-1.5">
                             @foreach ($popularTags as $tag)
                                 <a href="{{ route('blog.tag', $tag->slug) }}"
-                                    class="inline-block px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                                    class="bg-gray-100 px-2.5 py-1 text-xs text-gray-700 transition-colors hover:bg-brand hover:text-white focus-visible:outline-2 focus-visible:outline-brand dark:bg-gray-700 dark:text-gray-300">
                                     {{ $tag->name }}
-                                    <span
-                                        class="text-xs text-gray-500 dark:text-gray-400 ml-1">({{ $tag->published_articles_count }})</span>
+                                    <span class="sr-only">({{ $tag->published_articles_count }} artículos)</span>
                                 </a>
                             @endforeach
                         </div>
-                    </div>
+                    </section>
                 @endif
 
-                <!-- Sidebar Ad -->
                 <x-ad-banner location="sidebar_home" />
             </aside>
         </div>

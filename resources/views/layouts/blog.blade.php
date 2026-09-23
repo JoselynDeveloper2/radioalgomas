@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', config('app.name', 'Tucanaltv'))</title>
-    <meta name="description" content="@yield('meta_description', 'Tucanaltv - Tu fuente confiable de noticias locales y actualidad')">
-    <meta name="keywords" content="@yield('meta_keywords', 'noticias, actualidad, deportes, entretenimiento, política, Tucanaltv')">
-    <meta name="author" content="Tucanaltv">
+    <title>@yield('title', config('app.name', 'RadioAlgoMas'))</title>
+    <meta name="description" content="@yield('meta_description', 'RadioAlgoMas - Tu fuente confiable de noticias locales y actualidad')">
+    <meta name="keywords" content="@yield('meta_keywords', 'noticias, actualidad, deportes, entretenimiento, política, RadioAlgoMas')">
+    <meta name="author" content="RadioAlgoMas">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('og_title', config('app.name'))">
-    <meta property="og:description" content="@yield('og_description', 'Tucanaltv - Tu fuente confiable de noticias locales y actualidad')">
+    <meta property="og:description" content="@yield('og_description', 'RadioAlgoMas - Tu fuente confiable de noticias locales y actualidad')">
     <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
     <meta property="og:site_name" content="{{ config('app.name') }}">
 
@@ -22,7 +22,7 @@
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
     <meta property="twitter:title" content="@yield('twitter_title', config('app.name'))">
-    <meta property="twitter:description" content="@yield('twitter_description', 'Tucanaltv - Tu fuente confiable de noticias locales y actualidad')">
+    <meta property="twitter:description" content="@yield('twitter_description', 'RadioAlgoMas - Tu fuente confiable de noticias locales y actualidad')">
     <meta property="twitter:image" content="@yield('twitter_image', asset('images/og-default.jpg'))">
 
     <!-- Canonical URL -->
@@ -37,8 +37,9 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -68,37 +69,37 @@
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between py-2">
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                        <img src="{{ asset('images/logo-tucanaltv-top.png') }}" alt="Tucanaltv Logo" class="h-auto w-auto">
+                        <img src="{{ asset('images/radioalgomas-logo-2-ecualizador.svg') }}" alt="RadioAlgoMas Logo" class="h-[70px] w-auto">
                     </a>
                 </div>
 
                 <!-- Navigation -->
                 <nav class="hidden md:flex items-center space-x-8">
-                    <a href="{{ route('home') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors {{ request()->routeIs('home') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    <a href="{{ route('home') }}" class="text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-white transition-colors {{ request()->routeIs('home') ? 'text-brand dark:text-white font-semibold' : '' }}">
                         Inicio
                     </a>
-                    @foreach($categories ?? [] as $category)
+                    {{-- @foreach($categories ?? [] as $category)
                     <a href="{{ route('blog.category', $category->slug) }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors {{ request()->route('slug') === $category->slug ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
                         {{ $category->name }}
                     </a>
-                    @endforeach
+                    @endforeach --}}
                 </nav>
 
                 <!-- Search & Theme Toggle -->
                 <div class="flex items-center space-x-4">
                     <!-- Search Button -->
-                    <button type="button" onclick="toggleSearch()" class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                    <button type="button" onclick="toggleSearch()" aria-label="Buscar noticias" aria-controls="searchBar" class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </button>
 
                     <!-- Theme Toggle -->
-                    <button type="button" onclick="toggleTheme()" class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                    <button type="button" onclick="toggleTheme()" aria-label="Cambiar tema claro u oscuro" class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                         <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
@@ -108,7 +109,7 @@
                     </button>
 
                     <!-- Mobile Menu Button -->
-                    <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                    <button type="button" onclick="toggleMobileMenu()" aria-label="Abrir menú" aria-controls="mobileMenu" class="md:hidden p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
@@ -133,14 +134,14 @@
             <!-- Mobile Menu (Hidden by default) -->
             <div id="mobileMenu" class="hidden md:hidden pb-4">
                 <nav class="flex flex-col space-y-2">
-                    <a href="{{ route('home') }}" class="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors {{ request()->routeIs('home') ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
+                    <a href="{{ route('home') }}" class="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-brand dark:hover:text-white transition-colors {{ request()->routeIs('home') ? 'text-brand dark:text-white font-semibold' : '' }}">
                         Inicio
                     </a>
-                    @foreach($categories ?? [] as $category)
+                    {{-- @foreach($categories ?? [] as $category)
                     <a href="{{ route('blog.category', $category->slug) }}" class="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors {{ request()->route('slug') === $category->slug ? 'text-blue-600 dark:text-blue-400 font-semibold' : '' }}">
                         {{ $category->name }}
                     </a>
-                    @endforeach
+                    @endforeach --}}
                 </nav>
             </div>
         </div>
@@ -165,7 +166,7 @@
                 <!-- Logo y Descripción -->
                 <div class="md:col-span-2">
                     <div class="flex items-center space-x-2 mb-4">
-                        <img src="{{ asset('images/logo-tucanaltv.jpeg') }}" alt="Tucanaltv Logo" class="h-32 w-auto">
+                        <img src="{{ asset('images/radioalgomas-logo-2-ecualizador-blanco.svg') }}" alt="RadioAlgoMas Logo" class="h-16 w-auto">
                     </div>
                     <p class="text-gray-300 mb-4 max-w-md">
                         Tu fuente confiable de noticias locales y actualidad. Mantente informado con las últimas noticias, deportes, entretenimiento y más.
@@ -217,7 +218,7 @@
 
             <div class="border-t border-gray-700 mt-8 pt-8 text-center">
                 <p class="text-gray-400">
-                    &copy; {{ date('Y') }} Tucanaltv. Todos los derechos reservados.
+                    &copy; {{ date('Y') }} RadioAlgoMas. Todos los derechos reservados.
                 </p>
             </div>
         </div>

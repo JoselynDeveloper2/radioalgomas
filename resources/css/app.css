@@ -10,7 +10,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand: #1B3A5C;
+    --color-brand-dark: #142C47;
+    --color-brand-muted: #7A8CA0;
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -24,14 +28,14 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    /* Tucanaltv Brand Colors */
-    --color-tucanaltv-blue: #007bff;
-    --color-tucanaltv-blue-dark: #0056b3;
-    --color-tucanaltv-blue-light: #66b3ff;
-    --color-tucanaltv-hover: #9b3e37;
+    /* RadioAlgoMas Brand Colors */
+    --color-radioalgomas-blue: var(--color-brand);
+    --color-radioalgomas-blue-dark: var(--color-brand-dark);
+    --color-radioalgomas-blue-light: var(--color-brand-muted);
+    --color-radioalgomas-hover: var(--color-brand-dark);
 
-    --color-accent: var(--color-tucanaltv-blue);
-    --color-accent-content: var(--color-tucanaltv-blue);
+    --color-accent: var(--color-radioalgomas-blue);
+    --color-accent-content: var(--color-radioalgomas-blue);
     --color-accent-foreground: var(--color-white);
 }
 
@@ -72,68 +76,109 @@ select:focus[data-flux-control] {
     @apply size-4;
 } */
 
-/* Tucanaltv Custom Styles */
+/* RadioAlgoMas Custom Styles */
 @layer components {
-    .tucanaltv-header {
-        @apply bg-tucanaltv-blue text-white;
+    .radioalgomas-header {
+        @apply bg-radioalgomas-blue text-white;
     }
     
-    .tucanaltv-btn-primary {
-        @apply bg-tucanaltv-blue hover:bg-tucanaltv-blue-dark text-white font-semibold py-2 px-4 rounded transition-colors;
+    .radioalgomas-btn-primary {
+        @apply bg-radioalgomas-blue hover:bg-radioalgomas-blue-dark text-white font-semibold py-2 px-4 rounded transition-colors;
     }
     
-    .tucanaltv-btn-secondary {
+    .radioalgomas-btn-secondary {
         @apply bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded transition-colors;
     }
     
-    .tucanaltv-link-hover {
-        @apply hover:text-tucanaltv-hover transition-colors;
+    .radioalgomas-link-hover {
+        @apply hover:text-radioalgomas-hover transition-colors;
     }
     
-    .tucanaltv-category-badge {
+    .radioalgomas-category-badge {
         @apply inline-block px-3 py-1 text-xs font-semibold rounded-full;
     }
     
-    .tucanaltv-news-card {
+    .radioalgomas-news-card {
         @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300;
     }
     
-    .tucanaltv-featured-title {
-        @apply text-xl font-bold text-white bg-tucanaltv-blue py-3 px-3 mb-2;
+    .radioalgomas-featured-title {
+        @apply text-xl font-bold text-white bg-radioalgomas-blue py-3 px-3 mb-2;
+    }
+
+    /* Reproductor de radio */
+    .radio-live-dot {
+        animation: radio-pulse 1.8s ease-in-out infinite;
+    }
+
+    .radio-eq span {
+        transform-origin: bottom;
+        animation: radio-eq 0.9s ease-in-out infinite alternate;
+        animation-delay: calc(var(--i) * -0.13s);
+        animation-play-state: paused;
+    }
+
+    [data-radio-player][data-state='playing'] .radio-eq span {
+        animation-play-state: running;
+    }
+
+    .radio-canvas,
+    [data-radio-player][data-visualizer='live'][data-state='playing'] .radio-eq {
+        display: none;
+    }
+
+    [data-radio-player][data-visualizer='live'][data-state='playing'] .radio-canvas {
+        display: block;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .radio-live-dot,
+        .radio-eq span {
+            animation: none;
+        }
     }
 }
 
+@keyframes radio-pulse {
+    50% { opacity: 0.35; }
+}
+
+@keyframes radio-eq {
+    from { transform: scaleY(0.25); }
+    to { transform: scaleY(1); }
+}
+
 @layer utilities {
-    .bg-tucanaltv-blue {
-        background-color: var(--color-tucanaltv-blue);
+    .bg-radioalgomas-blue {
+        background-color: var(--color-radioalgomas-blue);
     }
     
-    .bg-tucanaltv-blue-dark {
-        background-color: var(--color-tucanaltv-blue-dark);
+    .bg-radioalgomas-blue-dark {
+        background-color: var(--color-radioalgomas-blue-dark);
     }
     
-    .bg-tucanaltv-blue-light {
-        background-color: var(--color-tucanaltv-blue-light);
+    .bg-radioalgomas-blue-light {
+        background-color: var(--color-radioalgomas-blue-light);
     }
     
-    .text-tucanaltv-blue {
-        color: var(--color-tucanaltv-blue);
+    .text-radioalgomas-blue {
+        color: var(--color-radioalgomas-blue);
     }
     
-    .text-tucanaltv-hover {
-        color: var(--color-tucanaltv-hover);
+    .text-radioalgomas-hover {
+        color: var(--color-radioalgomas-hover);
     }
     
-    .border-tucanaltv-blue {
-        border-color: var(--color-tucanaltv-blue);
+    .border-radioalgomas-blue {
+        border-color: var(--color-radioalgomas-blue);
     }
     
-    .hover\:bg-tucanaltv-blue-dark:hover {
-        background-color: var(--color-tucanaltv-blue-dark);
+    .hover\:bg-radioalgomas-blue-dark:hover {
+        background-color: var(--color-radioalgomas-blue-dark);
     }
     
-    .hover\:text-tucanaltv-hover:hover {
-        color: var(--color-tucanaltv-hover);
+    .hover\:text-radioalgomas-hover:hover {
+        color: var(--color-radioalgomas-hover);
     }
     
     /* Line clamp utilities for text truncation */
@@ -171,7 +216,7 @@ select:focus[data-flux-control] {
     }
     
     .prose a {
-        @apply text-tucanaltv-blue hover:text-tucanaltv-blue-dark no-underline;
+        @apply text-radioalgomas-blue hover:text-radioalgomas-blue-dark no-underline;
     }
     
     .prose a:hover {
@@ -194,8 +239,8 @@ select:focus[data-flux-control] {
     }
     
     /* Custom focus states */
-    .focus\:ring-tucanaltv:focus {
-        @apply ring-tucanaltv-blue;
+    .focus\:ring-radioalgomas:focus {
+        @apply ring-radioalgomas-blue;
     }
     
     /* Responsive typography */
