@@ -148,7 +148,7 @@ class ArticleObserver
 
         // Canonical URL
         if (empty($article->canonical_url)) {
-            $article->canonical_url = url('/articulos/' . ($article->slug ?: Str::slug($article->title)));
+            $article->canonical_url = route('blog.show', $article->slug ?: Str::slug($article->title));
         }
     }
 

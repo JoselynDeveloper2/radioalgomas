@@ -59,7 +59,6 @@ class ImageHelper
      */
     public static function getBrandedPlaceholder($width = 600, $height = 400): string
     {
-        // RadioAlgoMas brand colors - very subtle
-        return "https://placehold.co/{$width}x{$height}/f8fafc/007bff?text=RadioAlgoMas";
+        return "https://placehold.co/{$width}x{$height}/f8fafc/1b3a5c?text=Radio+Algo+M%C3%A1s";
     }
 }

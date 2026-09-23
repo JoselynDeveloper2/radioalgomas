@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -226,6 +227,28 @@ class Article extends Model
         return $this->published_at->diffForHumans();
     }
 
+    /**
+     * URL canónica a publicar. Las autogeneradas se guardaron con el dominio y la ruta del momento
+     * (incluso "/articulos/", que no existe), así que se recalculan; una externa (fuente del RSS) se respeta.
+     */
+    public function publicCanonicalUrl(): string
+    {
+        $self = route('blog.show', $this->slug);
+
+        foreach ([$this->seo_canonical_url, $this->canonical_url] as $url) {
+            if (! $url) {
+                continue;
+            }
+            if (str_contains($url, '/articulos/') || str_ends_with(rtrim($url, '/'), '/' . $this->slug)) {
+                return $self;
+            }
+
+            return $url;
+        }
+
+        return $self;
+    }
+
     // Generar Schema.org JSON-LD
     public function generateSchemaMarkup(): array
     {
@@ -233,8 +256,8 @@ class Article extends Model
             '@context' => 'https://schema.org',
             '@type' => 'Article',
             'headline' => $this->title,
-            'description' => $this->meta_description,
-            'image' => $this->featured_image ? url($this->featured_image) : null,
+            'description' => $this->meta_description ?: $this->excerpt,
+            'image' => $this->featured_image ? url(Storage::url($this->featured_image)) : null,
             'author' => [
                 '@type' => 'Person',
                 'name' => $this->user->name ?? 'Anónimo'
@@ -251,7 +274,7 @@ class Article extends Model
             'dateModified' => $this->updated_at->toISOString(),
             'mainEntityOfPage' => [
                 '@type' => 'WebPage',
-                '@id' => $this->canonical_url
+                '@id' => $this->publicCanonicalUrl()
             ],
             'articleSection' => $this->category->name ?? null,
             'keywords' => $this->meta_keywords,

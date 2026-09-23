@@ -41,6 +41,9 @@ return [
             'service_account_path' => env('GOOGLE_INDEXING_SERVICE_ACCOUNT_PATH'),
             'scopes' => ['https://www.googleapis.com/auth/indexing'],
         ],
+        // Vacíos = no se carga ningún script de medición.
+        'analytics_id' => env('GOOGLE_ANALYTICS_ID'),
+        'tag_manager_id' => env('GOOGLE_TAG_MANAGER_ID'),
     ],
 
 ];

@@ -22,6 +22,9 @@ Route::prefix('blog')->name('blog.')->group(function () {
 // Feeds y sitemap
 Route::get('/rss', [BlogController::class, 'rss'])->name('blog.rss');
 Route::get('/sitemap.xml', [BlogController::class, 'sitemap'])->name('sitemap');
+// Dinámico para que el sitemap salga con el dominio de cada entorno.
+Route::get('/robots.txt', fn () => response("User-agent: *\nDisallow: /tv-panel\n\nSitemap: " . route('sitemap') . "\n")
+    ->header('Content-Type', 'text/plain'));
 
 // Stream Proxy Routes
 Route::prefix('stream-proxy')->name('stream.proxy.')->group(function () {

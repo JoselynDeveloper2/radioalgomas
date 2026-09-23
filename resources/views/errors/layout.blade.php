@@ -42,10 +42,7 @@
         </style>
     </head>
     <body>
-        <!-- Google Tag Manager (noscript) -->
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQHH3HQ8"
-        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-        <!-- End Google Tag Manager (noscript) -->
+        @include('partials.analytics-noscript')
         
         <div class="flex-center position-ref full-height">
             <div class="content">

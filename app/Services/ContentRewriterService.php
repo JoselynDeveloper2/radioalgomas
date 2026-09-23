@@ -256,7 +256,7 @@ class ContentRewriterService
         return [
             'seo_title' => Str::limit($title, 58),
             'seo_meta_description' => Str::limit($plainContent, 155),
-            'seo_canonical_url' => url('/articulos/' . $article->slug),
+            'seo_canonical_url' => route('blog.show', $article->slug),
             'seo_keywords' => $this->extractKeywords($plainContent),
         ];
     }

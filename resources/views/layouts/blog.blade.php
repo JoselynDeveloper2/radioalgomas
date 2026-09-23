@@ -5,25 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', config('app.name', 'RadioAlgoMas'))</title>
-    <meta name="description" content="@yield('meta_description', 'RadioAlgoMas - Tu fuente confiable de noticias locales y actualidad')">
-    <meta name="keywords" content="@yield('meta_keywords', 'noticias, actualidad, deportes, entretenimiento, política, RadioAlgoMas')">
-    <meta name="author" content="RadioAlgoMas">
+    @php
+        // Las secciones ya llegan escapadas; solo se escapan los valores por defecto.
+        $siteName = config('app.name');
+        $description = trim($__env->yieldContent('meta_description')) ?: e("{$siteName}: radio digital en vivo y noticias locales, deportes, entretenimiento y más.");
+        $shareImage = trim($__env->yieldContent('og_image')) ?: e(asset('images/radioalgomas-og-image-azul.png'));
+    @endphp
+    <title>@yield('title', $siteName)</title>
+    <meta name="description" content="{!! $description !!}">
+    <meta name="keywords" content="@yield('meta_keywords', 'radio en vivo, radio digital, noticias, actualidad, deportes, entretenimiento, ' . $siteName)">
+    <meta name="author" content="{{ $siteName }}">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:locale" content="es_ES">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('og_title', config('app.name'))">
-    <meta property="og:description" content="@yield('og_description', 'RadioAlgoMas - Tu fuente confiable de noticias locales y actualidad')">
-    <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
-    <meta property="og:site_name" content="{{ config('app.name') }}">
+    <meta property="og:title" content="@yield('og_title', $siteName)">
+    <meta property="og:description" content="{!! trim($__env->yieldContent('og_description')) ?: $description !!}">
+    <meta property="og:image" content="{!! $shareImage !!}">
+    <meta property="og:site_name" content="{{ $siteName }}">
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="@yield('twitter_title', config('app.name'))">
-    <meta property="twitter:description" content="@yield('twitter_description', 'RadioAlgoMas - Tu fuente confiable de noticias locales y actualidad')">
-    <meta property="twitter:image" content="@yield('twitter_image', asset('images/og-default.jpg'))">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:title" content="@yield('twitter_title', $siteName)">
+    <meta name="twitter:description" content="{!! trim($__env->yieldContent('twitter_description')) ?: $description !!}">
+    <meta name="twitter:image" content="{!! trim($__env->yieldContent('twitter_image')) ?: $shareImage !!}">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="@yield('canonical_url', url()->current())">
@@ -47,24 +54,13 @@
     <!-- Schema.org JSON-LD -->
     @stack('schema')
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JRDQT4H1X1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-JRDQT4H1X1');
-    </script>
+    @include('partials.analytics')
 
     <!-- Additional Head Content -->
     @stack('head')
 </head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans antialiased">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQHH3HQ8"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
+    @include('partials.analytics-noscript')
 
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -73,7 +69,7 @@
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                        <img src="{{ asset('images/radioalgomas-logo-2-ecualizador.svg') }}" alt="RadioAlgoMas Logo" class="h-[70px] w-auto">
+                        <img src="{{ asset('images/radioalgomas-logo-2-ecualizador.svg') }}" alt="{{ config('app.name') }}" class="h-[70px] w-auto">
                     </a>
                 </div>
 

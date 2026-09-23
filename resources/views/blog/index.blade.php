@@ -1,8 +1,7 @@
 @extends('layouts.blog')
 
-@section('title', 'RadioAlgoMas')
-@section('meta_description', 'Mantente informado con las últimas noticias locales, deportes, entretenimiento y más en
-    RadioAlgoMas.')
+@section('title', config('app.name') . ' | Radio en vivo y noticias')
+@section('meta_description', 'Escucha ' . config('app.name') . ' en vivo por internet y mantente informado con las últimas noticias locales, deportes, entretenimiento y más.')
 
 @section('content')
     <div class="container mx-auto flex flex-col gap-12 px-4 pb-24 pt-4 sm:pt-6">

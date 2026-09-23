@@ -53,7 +53,7 @@ class BlogSeeder extends Seeder
                 'role' => User::ROLE_AUTHOR,
                 'is_active' => true,
                 'bio' => 'Periodista especializado en noticias locales y nacionales.',
-            'twitter' => '@periodista_tcv',
+            'twitter' => '@radioalgomas',
         ]);
 
         // Crear categorías

@@ -1,7 +1,7 @@
 @extends('layouts.blog')
 
 @section('title', 'Página no encontrada - 404')
-@section('meta_description', 'La página que buscas no existe o ha sido movida. Explora nuestro contenido en RadioAlgoMas.')
+@section('meta_description', 'La página que buscas no existe o ha sido movida. Explora nuestro contenido en ' . config('app.name') . '.')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-12">
