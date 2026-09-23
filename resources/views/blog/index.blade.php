@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="container mx-auto flex flex-col gap-12 px-4 pb-24 pt-4 sm:pt-6">
-        <h1 class="sr-only">{{ config('radio.name') }}: radio en vivo y noticias</h1>
+        <h1 class="sr-only">{{ \App\Models\RadioSetting::current()->station_name }}: radio en vivo y noticias</h1>
 
         <x-radio-player />
 

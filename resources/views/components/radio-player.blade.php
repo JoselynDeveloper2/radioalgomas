@@ -1,9 +1,10 @@
 @php
-    $now = now(config('radio.timezone'))->format('H:i');
-    $schedule = collect(config('radio.schedule'))->values();
+    $settings = \App\Models\RadioSetting::current();
+    $now = now($settings->timezone)->format('H:i');
+    $schedule = \App\Models\RadioShow::schedule()->values();
     $currentIndex = $schedule->search(fn ($s) => $s['start'] <= $now && $now < $s['end']);
     $current = $currentIndex === false ? null : $schedule[$currentIndex];
-    $show = $current ?? config('radio.fallback_show');
+    $show = $current ?? ['name' => $settings->fallback_show_name, 'host' => $settings->fallback_show_host];
 
     $upcoming = $current
         ? $schedule->slice($currentIndex)->take(4)
@@ -17,9 +18,9 @@
 <section
     data-radio-player
     data-state="idle"
-    data-autoplay="{{ config('radio.autoplay') ? 'true' : 'false' }}"
-    data-stream="{{ config('radio.stream_url') }}"
-    data-station="{{ config('radio.name') }}"
+    data-autoplay="{{ $settings->autoplay ? 'true' : 'false' }}"
+    data-stream="{{ $settings->stream_url }}"
+    data-station="{{ $settings->station_name }}"
     data-show="{{ $show['name'] }}"
     data-artwork="{{ asset('apple-touch-icon.png') }}"
     aria-labelledby="radio-show-title"
@@ -32,7 +33,7 @@
                         <span class="radio-live-dot size-2 rounded-full bg-red-500" aria-hidden="true"></span>
                         En vivo
                     </span>
-                    <span class="text-white/70">{{ config('radio.name') }}</span>
+                    <span class="text-white/70">{{ $settings->station_name }}</span>
                 </div>
                 <h2 id="radio-show-title" class="text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
                     {{ $show['name'] }}

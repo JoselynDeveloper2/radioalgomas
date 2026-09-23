@@ -1,5 +1,8 @@
 <?php
 
+// Valores de respaldo. Desde el administrador (Streaming > Configuración del
+// Player y Streaming > Programación) el cliente los sustituye sin tocar código;
+// estos solo se usan mientras esa configuración esté vacía (p. ej. recién desplegado).
 return [
     'name' => 'Radio Algo Más',
 
