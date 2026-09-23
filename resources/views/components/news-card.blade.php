@@ -1,32 +1,36 @@
-@props(['article', 'variant' => 'grid']) {{-- lead | side | grid --}}
+@props(['article', 'variant' => 'grid', 'showCategory' => true]) {{-- lead | side | grid | feature --}}
 
 @php
     $url = route('blog.show', $article->slug);
-    $category = $article->category->name ?? null;
+    $category = $showCategory ? ($article->category->name ?? null) : null;
     $author = $article->user->name ?? 'Redacción';
     $date = $article->published_at;
 
     $imageBox = match ($variant) {
         'lead' => 'aspect-[16/9]',
         'side' => 'aspect-[16/10] sm:w-44 sm:shrink-0',
+        'feature' => 'aspect-[16/9] lg:col-span-7 lg:aspect-auto lg:min-h-[420px]',
         default => 'aspect-[16/10]',
     };
     $title = match ($variant) {
         'lead' => 'text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight',
+        'feature' => 'text-2xl lg:text-3xl font-bold tracking-tight',
         'side' => 'text-lg font-semibold',
         default => 'text-lg font-bold',
     };
+    $eager = in_array($variant, ['lead', 'feature']);
 @endphp
 
 <article {{ $attributes->class([
-    'group flex',
-    'flex-col gap-4' => $variant === 'lead',
-    'flex-col gap-4 sm:flex-row' => $variant === 'side',
-    'h-full flex-col p-4' => $variant === 'grid',
+    'group',
+    'flex flex-col gap-4' => $variant === 'lead',
+    'flex flex-col gap-4 sm:flex-row' => $variant === 'side',
+    'flex h-full flex-col p-4' => $variant === 'grid',
+    'grid grid-cols-1 border border-gray-200 lg:grid-cols-12 dark:border-gray-700' => $variant === 'feature',
 ]) }}>
     <a href="{{ $url }}" tabindex="-1" aria-hidden="true" class="block overflow-hidden bg-gray-100 dark:bg-gray-800 {{ $imageBox }}">
         @if ($article->featured_image)
-            <img src="{{ Storage::url($article->featured_image) }}" alt="" loading="{{ $variant === 'lead' ? 'eager' : 'lazy' }}"
+            <img src="{{ Storage::url($article->featured_image) }}" alt="" loading="{{ $eager ? 'eager' : 'lazy' }}"
                 class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.02]">
         @else
             <div class="flex size-full items-center justify-center text-brand-muted">
@@ -35,7 +39,13 @@
         @endif
     </a>
 
-    <div @class(['flex flex-col', 'gap-3' => $variant === 'lead', 'gap-1.5' => $variant === 'side', 'flex-1 gap-1.5 pt-3' => $variant === 'grid'])>
+    <div @class([
+        'flex flex-col',
+        'gap-3' => $variant === 'lead',
+        'gap-1.5' => $variant === 'side',
+        'flex-1 gap-1.5 pt-3' => $variant === 'grid',
+        'gap-3 border-t border-gray-200 p-6 lg:col-span-5 lg:border-l lg:border-t-0 lg:p-8 dark:border-gray-700' => $variant === 'feature',
+    ])>
         @if ($variant === 'lead')
             <p class="flex flex-wrap items-center gap-x-2 text-xs text-gray-500 dark:text-gray-400">
                 @if ($category)<span class="text-sm font-semibold text-brand dark:text-white">{{ $category }}</span><span aria-hidden="true">·</span>@endif
@@ -55,6 +65,7 @@
             <p @class([
                 'text-gray-600 dark:text-gray-400',
                 'text-base leading-relaxed line-clamp-3' => $variant === 'lead',
+                'text-base leading-relaxed line-clamp-4' => $variant === 'feature',
                 'text-sm line-clamp-2' => $variant === 'side',
                 'text-sm line-clamp-3' => $variant === 'grid',
             ])>{{ $article->excerpt }}</p>
@@ -62,8 +73,12 @@
 
         @if ($variant === 'side')
             <p class="text-xs text-gray-500 dark:text-gray-400">Por {{ $author }} · <time datetime="{{ $date->toIso8601String() }}">{{ $date->diffForHumans() }}</time></p>
-        @elseif ($variant === 'grid')
-            <p class="mt-auto flex justify-between gap-2 border-t border-gray-200 pt-3 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+        @elseif (in_array($variant, ['grid', 'feature']))
+            <p @class([
+                'mt-auto flex justify-between gap-2 border-t border-gray-200 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400',
+                'pt-3' => $variant === 'grid',
+                'pt-4' => $variant === 'feature',
+            ])>
                 <span class="truncate">Por {{ $author }}</span>
                 <time datetime="{{ $date->toIso8601String() }}" class="shrink-0">{{ $date->diffForHumans() }}</time>
             </p>

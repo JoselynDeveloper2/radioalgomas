@@ -1,18 +1,5 @@
 @php
-    $settings = \App\Models\RadioSetting::current();
-    $now = now($settings->timezone)->format('H:i');
-    $schedule = \App\Models\RadioShow::schedule()->values();
-    $currentIndex = $schedule->search(fn ($s) => $s['start'] <= $now && $now < $s['end']);
-    $current = $currentIndex === false ? null : $schedule[$currentIndex];
-    $show = $current ?? ['name' => $settings->fallback_show_name, 'host' => $settings->fallback_show_host];
-
-    $upcoming = $current
-        ? $schedule->slice($currentIndex)->take(4)
-        : $schedule->filter(fn ($s) => $s['start'] > $now)->take(4);
-    if ($upcoming->isEmpty()) {
-        $upcoming = $schedule->take(4);
-    }
-    $next = $upcoming->first(fn ($s) => $s !== $current);
+    ['settings' => $settings, 'current' => $current, 'show' => $show, 'next' => $next, 'upcoming' => $upcoming] = \App\Models\RadioShow::lineup();
 @endphp
 
 <section

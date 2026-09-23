@@ -49,4 +49,33 @@ class RadioShow extends Model
             'host' => $show->host,
         ]);
     }
+
+    /**
+     * Qué suena ahora y qué sigue, en la hora local de la emisora.
+     * Fuera de la parrilla, "upcoming" muestra los primeros programas del día siguiente.
+     */
+    public static function lineup(int $take = 4): array
+    {
+        $settings = RadioSetting::current();
+        $now = now($settings->timezone)->format('H:i');
+        $schedule = static::schedule()->values();
+
+        $index = $schedule->search(fn ($s) => $s['start'] <= $now && $now < $s['end']);
+        $current = $index === false ? null : $schedule[$index];
+
+        $upcoming = $current
+            ? $schedule->slice($index)->take($take)
+            : $schedule->filter(fn ($s) => $s['start'] > $now)->take($take);
+        if ($upcoming->isEmpty()) {
+            $upcoming = $schedule->take($take);
+        }
+
+        return [
+            'settings' => $settings,
+            'current' => $current,
+            'show' => $current ?? ['name' => $settings->fallback_show_name, 'host' => $settings->fallback_show_host],
+            'next' => $upcoming->first(fn ($s) => $s !== $current),
+            'upcoming' => $upcoming->values(),
+        ];
+    }
 }

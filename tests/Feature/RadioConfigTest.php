@@ -44,6 +44,23 @@ test('radio schedule uses active shows from the admin, ordered by start time and
     expect(RadioShow::schedule()->pluck('name')->all())->toBe(['Mañanas', 'Tardes']);
 });
 
+test('radio lineup reports the current and next show, and falls back outside the schedule', function () {
+    RadioShow::create(['name' => 'Mañanas', 'host' => 'Luis', 'start_time' => '06:00', 'end_time' => '10:00']);
+    RadioShow::create(['name' => 'Mesa', 'host' => 'Ana', 'start_time' => '10:00', 'end_time' => '13:00']);
+
+    $this->travelTo(now(config('radio.timezone'))->setTime(7, 30));
+    $lineup = RadioShow::lineup();
+    expect($lineup['current']['name'])->toBe('Mañanas')
+        ->and($lineup['next']['name'])->toBe('Mesa')
+        ->and($lineup['show']['name'])->toBe('Mañanas');
+
+    $this->travelTo(now(config('radio.timezone'))->setTime(23, 0));
+    $lineup = RadioShow::lineup();
+    expect($lineup['current'])->toBeNull()
+        ->and($lineup['show']['name'])->toBe(config('radio.fallback_show.name'))
+        ->and($lineup['upcoming']->pluck('name')->all())->toBe(['Mañanas', 'Mesa']);
+});
+
 test('radio show times are normalized to HH:MM even with seconds from the time picker', function () {
     $show = RadioShow::create(['name' => 'Test', 'host' => 'Host', 'start_time' => '06:00:00', 'end_time' => '10:00:00']);
 
