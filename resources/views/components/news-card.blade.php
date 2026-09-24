@@ -30,12 +30,13 @@
     'flex h-full flex-col' => $variant === 'compact',
     'grid grid-cols-1 border border-gray-200 lg:grid-cols-12 dark:border-gray-700' => $variant === 'feature',
 ]) }}>
-    <a href="{{ $url }}" tabindex="-1" aria-hidden="true" class="block overflow-hidden bg-gray-100 dark:bg-gray-800 {{ $imageBox }}">
+    {{-- La imagen va absoluta: la caja define el alto, así una foto vertical no estira la tarjeta. --}}
+    <a href="{{ $url }}" tabindex="-1" aria-hidden="true" class="relative block overflow-hidden bg-gray-100 dark:bg-gray-800 {{ $imageBox }}">
         @if ($article->featured_image)
             <img src="{{ Storage::url($article->featured_image) }}" alt="" loading="{{ $eager ? 'eager' : 'lazy' }}"
-                class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.02]">
+                class="absolute inset-0 size-full object-cover object-[50%_25%] transition-transform duration-500 group-hover:scale-[1.02]">
         @else
-            <div class="flex size-full items-center justify-center text-brand-muted">
+            <div class="absolute inset-0 flex items-center justify-center text-brand-muted">
                 <svg class="size-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
             </div>
         @endif
