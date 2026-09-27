@@ -18,7 +18,7 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:locale" content="es_ES">
+    <meta property="og:locale" content="es_US">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('og_title', $siteName)">
     <meta property="og:description" content="{!! trim($__env->yieldContent('og_description')) ?: $description !!}">

@@ -19,3 +19,18 @@ test('home publishes WebSite and RadioStation schema with brand name variants', 
         ->and($station['alternateName'])->toContain('radioalgomas.com')
         ->and($station['logo'])->toBe(asset('images/logo.png'));
 });
+
+test('home title carries both brand spellings', function () {
+    $this->get('/')->assertSee('<title>Radio Algo Más (RadioAlgoMas) | Radio en vivo y noticias</title>', false);
+});
+
+test('blog index and home share the home canonical', function () {
+    $canonical = '<link rel="canonical" href="' . route('home') . '">';
+
+    $this->get('/blog')->assertSee($canonical, false);
+    $this->get('/')->assertSee($canonical, false);
+});
+
+test('open graph locale targets US Spanish', function () {
+    $this->get('/')->assertSee('<meta property="og:locale" content="es_US">', false);
+});

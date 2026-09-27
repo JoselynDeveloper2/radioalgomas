@@ -1,7 +1,8 @@
 @extends('layouts.blog')
 
-@section('title', config('app.name') . ' | Radio en vivo y noticias')
+@section('title', \App\Models\RadioSetting::current()->station_name . ' (' . config('app.name') . ') | Radio en vivo y noticias')
 @section('meta_description', 'Escucha ' . config('app.name') . ' en vivo por internet y mantente informado con las últimas noticias locales, deportes, entretenimiento y más.')
+@section('canonical_url', route('home'))
 
 @push('schema')
     <x-site-schema />
