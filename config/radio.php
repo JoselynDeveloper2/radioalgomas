@@ -6,6 +6,13 @@
 return [
     'name' => 'Radio Algo Más',
 
+    // Variantes con las que la gente escribe la marca; van en el JSON-LD para que
+    // Google deje de "corregir" radioalgomas a "radio gomas".
+    'alternate_names' => ['RadioAlgoMas', 'Radio Algo Mas', 'radioalgomas', 'radioalgomas.com'],
+
+    // URLs de los perfiles oficiales (Facebook, Instagram, YouTube, Google Business...).
+    'same_as' => [],
+
     // Demo: SomaFM Groove Salad (Icecast, MP3, CORS abierto). Reemplazar por el stream del cliente.
     'stream_url' => env('RADIO_STREAM_URL', 'https://ice1.somafm.com/groovesalad-128-mp3'),
 

@@ -3,6 +3,10 @@
 @section('title', config('app.name') . ' | Radio en vivo y noticias')
 @section('meta_description', 'Escucha ' . config('app.name') . ' en vivo por internet y mantente informado con las últimas noticias locales, deportes, entretenimiento y más.')
 
+@push('schema')
+    <x-site-schema />
+@endpush
+
 @section('content')
     <div class="container mx-auto flex flex-col gap-12 px-4 pb-24 pt-4 sm:pt-6">
         <h1 class="sr-only">{{ \App\Models\RadioSetting::current()->station_name }}: radio en vivo y noticias</h1>
