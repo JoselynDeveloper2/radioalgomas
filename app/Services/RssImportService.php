@@ -191,6 +191,14 @@ class RssImportService
                         'type' => $enclosure->get_type(),
                     ];
                 }
+
+                // media:thumbnail (p. ej. BBC Mundo): SimplePie lo deja en una enclosure sin link.
+                foreach ($enclosure->get_thumbnails() ?? [] as $thumbnail) {
+                    $enclosures[] = [
+                        'url' => $thumbnail,
+                        'type' => 'image/unknown',
+                    ];
+                }
             }
         }
 
