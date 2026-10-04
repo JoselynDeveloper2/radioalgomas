@@ -2,7 +2,7 @@
 
 use App\Services\RssImportService;
 
-test('media:thumbnail images are picked up (BBC Mundo style feeds)', function () {
+test('media:thumbnail images are picked up at 800px (BBC Mundo style feeds)', function () {
     $feed = new SimplePie\SimplePie();
     $feed->set_raw_data(<<<'XML'
         <?xml version="1.0" encoding="UTF-8"?>
@@ -22,5 +22,5 @@ test('media:thumbnail images are picked up (BBC Mundo style feeds)', function ()
 
     $extract = (new ReflectionMethod(RssImportService::class, 'extractEnclosures'))->getClosure(new RssImportService());
 
-    expect(array_column($extract($feed->get_item(0)), 'url'))->toContain('https://ichef.bbci.co.uk/ace/ws/240/foto.jpg');
+    expect(array_column($extract($feed->get_item(0)), 'url'))->toContain('https://ichef.bbci.co.uk/ace/ws/800/foto.jpg');
 });

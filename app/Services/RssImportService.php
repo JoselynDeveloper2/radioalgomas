@@ -195,7 +195,8 @@ class RssImportService
                 // media:thumbnail (p. ej. BBC Mundo): SimplePie lo deja en una enclosure sin link.
                 foreach ($enclosure->get_thumbnails() ?? [] as $thumbnail) {
                     $enclosures[] = [
-                        'url' => $thumbnail,
+                        // BBC entrega 240px; su CDN sirve la misma foto a 800px cambiando el ancho.
+                        'url' => preg_replace('#(ichef\.bbci\.co\.uk/ace/ws/)\d+/#', '${1}800/', $thumbnail),
                         'type' => 'image/unknown',
                     ];
                 }
